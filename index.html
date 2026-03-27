@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hacemo â We Make It Real</title>
+<meta name="description" content="Unique objects, made real. Hacemo brings your ideas to life with 3D printing. Beautiful, custom items designed in El Paso.">
+<meta name="theme-color" content="#E8553A">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23E8553A'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='system-ui' font-weight='800' font-size='38' fill='%23FAF6F1'%3Eh%3C/text%3E%3C/svg%3E">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Hacemo â We Make It Real">
+<meta property="og:description" content="Unique objects, made real. Beautiful custom items designed in El Paso, printed with care.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://hacemo.com">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --coral: #E8553A;
+    --coral-dark: #D14A32;
+    --coral-light: #EE6B50;
+    --slate: #1E2A3A;
+    --cream: #FAF6F1;
+    --terracotta: #C4775A;
+    --stone: #6B7B8D;
+    --sage: #5A8C6F;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cream);
+    color: var(--slate);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- NAV ---- */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 20px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+  nav.scrolled {
+    background: rgba(250, 246, 241, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 1px 0 rgba(30, 42, 58, 0.06);
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+  .nav-logo svg { flex-shrink: 0; }
+  .nav-logo span {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--slate);
+  }
+  .nav-cta {
+    background: var(--coral);
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    text-decoration: none;
+  }
+  .nav-cta:hover { background: var(--coral-dark); transform: translateY(-1px); }
+
+  /* ---- HERO ---- */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(232,85,58,0.06) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -300px;
+    left: -100px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(90,140,111,0.04) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero-icon {
+    width: 88px;
+    height: 88px;
+    border-radius: 22.37%;
+    background: linear-gradient(145deg, var(--coral-light) 0%, var(--coral) 40%, var(--coral-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+    box-shadow: 0 12px 40px rgba(232, 85, 58, 0.3), 0 4px 12px rgba(0,0,0,0.08);
+    animation: floatIcon 6s ease-in-out infinite;
+  }
+  @keyframes floatIcon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .hero-icon span {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 54px;
+    color: var(--cream);
+    line-height: 1;
+    margin-top: 4px;
+  }
+
+  .hero h1 {
+    font-size: clamp(40px, 7vw, 72px);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    max-width: 700px;
+  }
+  .hero h1 .accent { color: var(--coral); }
+
+  .hero .subtitle {
+    font-size: clamp(17px, 2.5vw, 20px);
+    color: var(--stone);
+    max-width: 520px;
+    margin-bottom: 48px;
+    line-height: 1.7;
+  }
+
+  .hero-form {
+    display: flex;
+    gap: 12px;
+    max-width: 460px;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-form input {
+    flex: 1;
+    padding: 16px 20px;
+    border: 2px solid #e0d8cf;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 16px;
+    background: #fff;
+    color: var(--slate);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .hero-form input:focus { border-color: var(--coral); }
+  .hero-form input::placeholder { color: #b0a89e; }
+  .hero-form button {
+    padding: 16px 32px;
+    background: var(--coral);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    white-space: nowrap;
+  }
+  .hero-form button:hover { background: var(--coral-dark); transform: translateY(-1px); }
+
+  .hero-note {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--stone);
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bounce 2s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ---- FEATURES ---- */
+  .features {
+    padding: 100px 48px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--coral);
+    margin-bottom: 12px;
+  }
+  .features h2 {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .features .intro {
+    font-size: 17px;
+    color: var(--stone);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 64px;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .feature-card {
+    background: #fff;
+    border: 1px solid #e8e0d8;
+    border-radius: 20px;
+    padding: 36px 28px;
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(30, 42, 58, 0.08);
+  }
+  .feature-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+  .feature-icon.coral { background: rgba(232, 85, 58, 0.1); }
+  .feature-icon.sage { background: rgba(90, 140, 111, 0.1); }
+  .feature-icon.slate { background: rgba(30, 42, 58, 0.08); }
+  .feature-card h3 {
+    font-size: 19px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .feature-card p {
+    font-size: 15px;
+    color: var(--stone);
+    line-height: 1.6;
+  }
+
+  /* ---- HOW IT WORKS ---- */
+  .how {
+    background: var(--slate);
+    color: var(--cream);
+    padding: 100px 48px;
+  }
+  .how-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .how .section-label { color: var(--coral); }
+  .how h2 {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    margin-bottom: 64px;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  .step-num {
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--coral);
+    opacity: 0.6;
+    margin-bottom: 16px;
+    line-height: 1;
+  }
+  .step h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .step p {
+    font-size: 15px;
+    color: var(--stone);
+    line-height: 1.7;
+  }
+
+  /* ---- CTA ---- */
+  .cta-section {
+    padding: 100px 48px;
+    text-align: center;
+  }
+  .cta-section h2 {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+  .cta-section h2 .accent { color: var(--coral); }
+  .cta-section .subtitle {
+    font-size: 18px;
+    color: var(--stone);
+    margin-bottom: 40px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .cta-form {
+    display: flex;
+    gap: 12px;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+  .cta-form input {
+    flex: 1;
+    padding: 16px 20px;
+    border: 2px solid #e0d8cf;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 16px;
+    background: #fff;
+    color: var(--slate);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .cta-form input:focus { border-color: var(--coral); }
+  .cta-form input::placeholder { color: #b0a89e; }
+  .cta-form button {
+    padding: 16px 32px;
+    background: var(--coral);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    white-space: nowrap;
+  }
+  .cta-form button:hover { background: var(--coral-dark); transform: translateY(-1px); }
+
+  /* ---- FOOTER ---- */
+  footer {
+    background: var(--slate);
+    color: var(--stone);
+    padding: 48px;
+    text-align: center;
+  }
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .footer-logo span { font-size: 18px; font-weight: 700; color: var(--cream); letter-spacing: 1px; }
+  footer .tagline { font-size: 14px; margin-bottom: 24px; }
+  footer .tagline a { color: var(--coral); text-decoration: none; }
+  .footer-links { display: flex; gap: 24px; justify-content: center; font-size: 14px; }
+  .footer-links a { color: var(--stone); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--coral); }
+  footer .copyright { margin-top: 32px; font-size: 12px; color: #4a5a6a; }
+
+  /* ---- SUCCESS STATE ---- */
+  .form-success {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 24px;
+    background: rgba(90, 140, 111, 0.1);
+    border: 1px solid rgba(90, 140, 111, 0.3);
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--sage);
+  }
+  .form-success.show { display: flex; }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-logo span { font-size: 18px; }
+    .nav-cta { padding: 8px 16px; font-size: 13px; }
+    .hero { padding: 100px 20px 60px; }
+    .hero-icon { width: 72px; height: 72px; margin-bottom: 32px; }
+    .hero-icon span { font-size: 44px; }
+    .hero-form { flex-direction: column; }
+    .features { padding: 64px 20px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .how { padding: 64px 20px; }
+    .steps { grid-template-columns: 1fr; gap: 40px; }
+    .cta-section { padding: 64px 20px; }
+    .cta-form { flex-direction: column; }
+    footer { padding: 40px 20px; }
+    .footer-links { flex-wrap: wrap; }
+  }
+
+  /* ---- ANIMATIONS ---- */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <svg width="36" height="36" viewBox="0 0 36 36">
+      <defs><linearGradient id="navGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#EE6B50"/><stop offset="40%" stop-color="#E8553A"/><stop offset="100%" stop-color="#D14A32"/></linearGradient></defs>
+      <rect width="36" height="36" rx="8" fill="url(#navGrad)"/>
+      <text x="18" y="25" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="22" fill="#FAF6F1">h</text>
+    </svg>
+    <span>hacemo</span>
+  </a>
+  <a href="#notify" class="nav-cta">Get Notified</a>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="top">
+  <div class="hero-icon">
+    <span>h</span>
+  </div>
+  <h1>Unique objects,<br><span class="accent">made real.</span></h1>
+  <p class="subtitle">Beautiful, custom items designed in El Paso and printed with care. The app is coming soon â be the first to know.</p>
+
+  <form class="hero-form" id="heroForm" onsubmit="return handleSubmit(event, 'heroForm')">
+    <input type="email" placeholder="you@email.com" required aria-label="Email address">
+    <button type="submit">Notify Me</button>
+  </form>
+  <div class="form-success" id="heroFormSuccess">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+    You're on the list. We'll be in touch.
+  </div>
+  <p class="hero-note">No spam. Just launch updates.</p>
+
+  <div class="hero-scroll">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b0a89e" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+  <p class="section-label fade-up">What We Do</p>
+  <h2 class="fade-up">Not mass-produced.<br>Made for you.</h2>
+  <p class="intro fade-up">Every item is printed to order. No warehouses, no leftover stock â just beautiful objects made one at a time, shipped to your door.</p>
+
+  <div class="features-grid">
+    <div class="feature-card fade-up">
+      <div class="feature-icon coral">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E8553A" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <h3>Curated catalog</h3>
+      <p>Handpicked designs across home, desk, tech, and lifestyle. Every item is tested and refined before it hits the store.</p>
+    </div>
+
+    <div class="feature-card fade-up">
+      <div class="feature-icon sage">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A8C6F" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      <h3>Made with care</h3>
+      <p>Designed in El Paso, printed on professional-grade machines. We obsess over quality so each piece feels special.</p>
+    </div>
+
+    <div class="feature-card fade-up">
+      <div class="feature-icon slate">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1E2A3A" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H7a2 2 0 01-2-2v-4"/></svg>
+      </div>
+      <h3>Ships to your door</h3>
+      <p>US and Mexico delivery. Fast shipping from the border corridor, so you get your items without the long wait.</p>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="how" id="how">
+  <div class="how-inner">
+    <p class="section-label fade-up">How It Works</p>
+    <h2 class="fade-up">Simple as it should be.</h2>
+
+    <div class="steps">
+      <div class="step fade-up">
+        <div class="step-num">01</div>
+        <h3>Browse</h3>
+        <p>Open the app and explore our curated collection. Filter by category, color, or room â find something that fits your space.</p>
+      </div>
+      <div class="step fade-up">
+        <div class="step-num">02</div>
+        <h3>Order</h3>
+        <p>Pick your item and check out in seconds. Your piece is printed fresh â no pulling from a shelf, no settling for what's left.</p>
+      </div>
+      <div class="step fade-up">
+        <div class="step-num">03</div>
+        <h3>Enjoy</h3>
+        <p>Your one-of-a-kind item arrives at your door. Unbox something that was made just for you. That's it â no catch.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="notify">
+  <h2 class="fade-up">Be the first to <span class="accent">make it real.</span></h2>
+  <p class="subtitle fade-up">The Hacemo app launches soon. Drop your email and we'll let you know the moment it's live.</p>
+
+  <form class="cta-form fade-up" id="ctaForm" onsubmit="return handleSubmit(event, 'ctaForm')">
+    <input type="email" placeholder="you@email.com" required aria-label="Email address">
+    <button type="submit">Notify Me</button>
+  </form>
+  <div class="form-success" id="ctaFormSuccess">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+    You're on the list. We'll be in touch.
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28">
+      <rect width="28" height="28" rx="6" fill="#E8553A"/>
+      <text x="14" y="19.5" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="17" fill="#FAF6F1">h</text>
+    </svg>
+    <span>hacemo</span>
+  </div>
+  <p class="tagline">We make it real. / Lo hacemos realidad.</p>
+  <div class="footer-links">
+    <a href="mailto:info@hacemo.com">Contact</a>
+    <a href="#features">Features</a>
+    <a href="#how">How It Works</a>
+  </div>
+  <p class="copyright">&copy; 2026 Hacemo. Designed in El Paso.</p>
+</footer>
+
+<script>
+// Nav scroll effect
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// Fade-up on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// Form handling
+function handleSubmit(e, formId) {
+  e.preventDefault();
+  const form = document.getElementById(formId);
+  const success = document.getElementById(formId + 'Success');
+  const email = form.querySelector('input[type="email"]').value;
+
+  // Store email in localStorage for now (replace with real backend later)
+  const emails = JSON.parse(localStorage.getItem('hacemo_waitlist') || '[]');
+  if (!emails.includes(email)) {
+    emails.push(email);
+    localStorage.setItem('hacemo_waitlist', JSON.stringify(emails));
+  }
+
+  form.style.display = 'none';
+  success.classList.add('show');
+  return false;
+}
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+</script>
+
+</body>
+</html>
