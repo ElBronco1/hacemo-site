@@ -31,6 +31,10 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--slate);
@@ -38,22 +42,32 @@
             line-height: 1.6;
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            * { animation: none !important; transition: none !important; }
+        }
+
         /* ========== NAVBAR ========== */
         .navbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 24px;
-            background: var(--white);
-            border-bottom: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 1px solid rgba(232, 224, 216, 0.5);
+            transition: border-color 0.3s;
+        }
+
+        .navbar.scrolled {
+            border-bottom-color: var(--border);
         }
 
         .navbar-brand {
-            font-size: 24px;
+            font-size: clamp(20px, 5vw, 28px);
             font-weight: 700;
             color: var(--coral);
             text-decoration: none;
@@ -61,7 +75,7 @@
 
         .navbar-search {
             flex: 1;
-            max-width: 400px;
+            max-width: 420px;
             margin: 0 32px;
         }
 
@@ -72,11 +86,19 @@
             border-radius: var(--radius-sm);
             font-family: inherit;
             font-size: 14px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.2s;
+        }
+
+        .navbar-search input:focus {
+            outline: none;
+            border-color: var(--coral);
+            background: var(--white);
         }
 
         .navbar-actions {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             align-items: center;
         }
 
@@ -91,11 +113,19 @@
             padding: 8px 12px;
             border-radius: var(--radius-sm);
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .nav-btn:hover {
             background: var(--cream);
             color: var(--coral);
+        }
+
+        .nav-btn-icon {
+            position: relative;
+            font-size: 18px;
         }
 
         .cart-badge {
@@ -110,93 +140,298 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
         }
 
-        .nav-btn-icon {
-            position: relative;
-        }
-
-        @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                gap: 12px;
-                padding: 12px;
-            }
-
-            .navbar-search {
-                max-width: 100%;
-                margin: 0;
-            }
-
-            .navbar-brand {
-                width: 100%;
-                text-align: center;
-            }
-
-            .navbar-actions {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        /* ========== HERO BANNER ========== */
-        .hero {
-            background: linear-gradient(135deg, var(--coral) 0%, var(--coral-light) 100%);
-            color: var(--white);
-            padding: 60px 24px;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        .hero p {
-            font-size: 20px;
-            margin-bottom: 32px;
-            opacity: 0.95;
-        }
-
-        .category-quick-links {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .category-btn {
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.4);
-            color: var(--white);
-            border-radius: var(--radius-sm);
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
             cursor: pointer;
-            font-weight: 500;
-            font-family: inherit;
-            transition: all 0.2s;
         }
 
-        .category-btn:hover {
-            background: rgba(255,255,255,0.3);
-            border-color: rgba(255,255,255,0.6);
+        .hamburger span {
+            width: 24px;
+            height: 2px;
+            background: var(--slate);
+            transition: all 0.3s;
         }
 
-        /* ========== CATEGORY PILLS ========== */
-        .category-pills {
+        /* ========== MOBILE DRAWER ========== */
+        .mobile-drawer {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 60px;
+            width: 100%;
+            height: calc(100vh - 60px);
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+        }
+
+        .mobile-drawer.active {
             display: flex;
-            gap: 12px;
-            padding: 20px 24px;
-            overflow-x: auto;
-            background: var(--cream);
+        }
+
+        .drawer-content {
+            background: var(--white);
+            width: 80%;
+            max-width: 300px;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .drawer-section {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
             border-bottom: 1px solid var(--border);
         }
 
+        .drawer-section:last-child {
+            border-bottom: none;
+        }
+
+        .drawer-section h3 {
+            font-size: 12px;
+            color: var(--stone);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .drawer-link {
+            display: block;
+            padding: 10px 0;
+            color: var(--slate);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .drawer-link:hover {
+            color: var(--coral);
+        }
+
+        /* ========== HERO SECTION ========== */
+        .hero {
+            background: linear-gradient(135deg, var(--cream) 0%, rgba(232, 224, 216, 0.8) 100%);
+            padding: clamp(40px, 10vw, 80px) 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .hero-left h1 {
+            font-size: clamp(28px, 6vw, 56px);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 16px;
+            color: var(--slate);
+        }
+
+        .hero-left p {
+            font-size: clamp(14px, 2.5vw, 18px);
+            color: var(--stone);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            padding: 14px 32px;
+            background: var(--coral);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 24px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .hero-cta:hover {
+            background: var(--coral-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .hero-right {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .hero-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 140px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .hero-card:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .hero-card:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        .hero-card:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+
+        .hero-card-emoji {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+
+        .hero-card-text {
+            font-size: 12px;
+            color: var(--stone);
+            text-align: center;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .hero-trust {
+            display: flex;
+            gap: 24px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+            padding-top: 24px;
+            border-top: 1px solid rgba(232, 224, 216, 0.5);
+        }
+
+        .trust-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .trust-badge-icon {
+            font-size: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .hero-right {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero {
+                padding: 32px 16px;
+                gap: 24px;
+            }
+
+            .hero-right {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .hero-trust {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+
+        /* ========== FEATURED CAROUSEL ========== */
+        .featured-carousel {
+            padding: 40px 24px;
+            background: var(--cream);
+            overflow: hidden;
+        }
+
+        .carousel-header {
+            max-width: 1400px;
+            margin: 0 auto 24px;
+        }
+
+        .carousel-header h2 {
+            font-size: clamp(20px, 4vw, 32px);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .carousel-header p {
+            font-size: 14px;
+            color: var(--stone);
+        }
+
+        .carousel-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            display: flex;
+            gap: 20px;
+            padding: 0 0 10px 0;
+        }
+
+        .carousel-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .carousel-card {
+            flex: 0 0 280px;
+            scroll-snap-align: start;
+        }
+
+        /* ========== CATEGORY PILLS ========== */
+        .category-nav {
+            padding: 20px 24px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .category-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-pills {
+            display: flex;
+            gap: 12px;
+            max-width: 1400px;
+            margin: 0 auto;
+            scroll-snap-type: x mandatory;
+        }
+
         .pill {
-            padding: 10px 20px;
+            padding: 10px 18px;
             background: var(--white);
             border: 1px solid var(--border);
             border-radius: 24px;
@@ -205,6 +440,11 @@
             transition: all 0.2s;
             font-weight: 500;
             font-family: inherit;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .pill:hover {
@@ -218,13 +458,29 @@
             border-color: var(--coral);
         }
 
+        .pill-icon {
+            font-size: 16px;
+        }
+
         /* ========== FILTERS & SORT ========== */
         .filters-section {
             display: flex;
             gap: 16px;
             padding: 20px 24px;
-            background: var(--cream);
+            background: var(--white);
             flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .filters-left {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            flex: 1;
         }
 
         .filter-group {
@@ -236,6 +492,7 @@
         .filter-group label {
             font-weight: 500;
             font-size: 14px;
+            color: var(--slate);
         }
 
         .filter-group select {
@@ -244,63 +501,115 @@
             border-radius: var(--radius-sm);
             font-family: inherit;
             cursor: pointer;
+            background: var(--white);
+            transition: all 0.2s;
+        }
+
+        .filter-group select:hover,
+        .filter-group select:focus {
+            border-color: var(--coral);
+        }
+
+        .result-count {
+            font-size: 14px;
+            color: var(--stone);
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .filters-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filters-left {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-group select {
+                width: 100%;
+            }
         }
 
         /* ========== PRODUCT GRID ========== */
         .products-section {
-            padding: 24px;
+            padding: 40px 24px;
             max-width: 1400px;
             margin: 0 auto;
         }
 
-        .products-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 24px;
         }
 
         .product-card {
             background: var(--white);
-            border: 1px solid var(--border);
+            border: 1px solid rgba(232, 224, 216, 0.6);
             border-radius: var(--radius);
             overflow: hidden;
             box-shadow: var(--shadow-sm);
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             cursor: pointer;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            animation: fadeInCard 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .product-card:nth-child(1) { animation-delay: 0s; }
+        .product-card:nth-child(2) { animation-delay: 0.05s; }
+        .product-card:nth-child(3) { animation-delay: 0.1s; }
+        .product-card:nth-child(4) { animation-delay: 0.15s; }
+        .product-card:nth-child(n+5) { animation-delay: 0.2s; }
+
+        @keyframes fadeInCard {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .product-card:hover {
             box-shadow: var(--shadow-md);
-            transform: translateY(-4px);
+            transform: translateY(-6px);
         }
 
         .product-emoji {
             width: 100%;
-            height: 160px;
-            background: var(--cream);
+            height: 180px;
+            background: radial-gradient(circle at 35% 35%, var(--cream) 0%, rgba(232, 224, 216, 0.5) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 80px;
-            border-bottom: 1px solid var(--border);
+            font-size: 72px;
+            border-bottom: 1px solid rgba(232, 224, 216, 0.6);
             position: relative;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover .product-emoji {
+            transform: scale(1.08);
         }
 
         .product-heart {
             position: absolute;
             top: 12px;
             right: 12px;
-            background: var(--white);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
             border: none;
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
             width: 40px;
             height: 40px;
@@ -309,64 +618,76 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
-            box-shadow: var(--shadow-sm);
+            z-index: 10;
         }
 
         .product-heart:hover {
-            transform: scale(1.1);
+            transform: scale(1.12);
+            background: rgba(255, 255, 255, 0.9);
         }
 
         .product-heart.favorited {
             color: var(--coral);
         }
 
+        .product-info {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
         .product-tags {
             display: flex;
             gap: 6px;
-            padding: 8px 12px;
+            margin-bottom: 10px;
             flex-wrap: wrap;
         }
 
         .product-tag {
             font-size: 11px;
             font-weight: 600;
-            padding: 4px 8px;
+            padding: 4px 10px;
             border-radius: 4px;
-            background: var(--coral);
-            color: var(--white);
+            background: rgba(232, 85, 58, 0.1);
+            color: var(--coral);
         }
 
         .product-tag.popular {
-            background: var(--sage);
+            background: rgba(90, 140, 111, 0.1);
+            color: var(--sage);
         }
 
         .product-tag.limited {
-            background: var(--terracotta);
-        }
-
-        .product-info {
-            padding: 12px;
+            background: rgba(196, 119, 90, 0.1);
+            color: var(--terracotta);
         }
 
         .product-category {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--stone);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         .product-name {
-            font-size: 16px;
+            font-size: clamp(13px, 2vw, 16px);
             font-weight: 600;
             margin: 8px 0;
             line-height: 1.3;
+            color: var(--slate);
         }
 
         .product-desc {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--stone);
             margin-bottom: 12px;
             line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .product-rating {
@@ -378,16 +699,21 @@
             margin-bottom: 12px;
         }
 
+        .product-rating-stars {
+            color: #FFC107;
+        }
+
         .product-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding-top: 12px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid rgba(232, 224, 216, 0.6);
+            margin-top: auto;
         }
 
         .product-price {
-            font-size: 18px;
+            font-size: clamp(16px, 2.5vw, 20px);
             font-weight: 700;
             color: var(--coral);
         }
@@ -396,19 +722,26 @@
             background: var(--coral);
             color: var(--white);
             border: none;
-            padding: 8px 16px;
-            border-radius: var(--radius-sm);
+            padding: 8px 14px;
+            border-radius: 20px;
             cursor: pointer;
             font-weight: 600;
             font-family: inherit;
             transition: all 0.2s;
+            font-size: 13px;
+            white-space: nowrap;
         }
 
         .product-add-cart:hover {
             background: var(--coral-dark);
+            transform: scale(1.05);
         }
 
-        /* ========== PRODUCT DETAIL MODAL ========== */
+        .product-add-cart.added {
+            background: var(--sage);
+        }
+
+        /* ========== PRODUCT MODAL ========== */
         .modal {
             display: none;
             position: fixed;
@@ -416,7 +749,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -429,12 +763,24 @@
 
         .modal-content {
             background: var(--white);
-            border-radius: var(--radius);
+            border-radius: 20px;
             max-width: 700px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .modal-header {
@@ -451,12 +797,17 @@
             font-size: 24px;
             cursor: pointer;
             color: var(--stone);
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--coral);
         }
 
         .modal-emoji {
             width: 100%;
             height: 240px;
-            background: var(--cream);
+            background: linear-gradient(135deg, var(--cream) 0%, rgba(90, 140, 111, 0.05) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -468,8 +819,9 @@
         }
 
         .modal-body h2 {
-            font-size: 28px;
+            font-size: clamp(20px, 5vw, 32px);
             margin-bottom: 8px;
+            color: var(--slate);
         }
 
         .modal-body p {
@@ -488,7 +840,7 @@
         .modal-specs-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 10px 0;
             font-size: 14px;
         }
 
@@ -507,57 +859,64 @@
 
         .modal-materials h4 {
             font-size: 14px;
-            margin-bottom: 8px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--slate);
         }
 
-        .modal-material-chips {
+        .material-chips {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
         }
 
         .material-chip {
+            background: rgba(232, 85, 58, 0.1);
+            color: var(--coral);
             padding: 6px 12px;
-            background: var(--cream);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            font-size: 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
         }
 
-        .modal-footer {
+        .modal-actions {
             display: flex;
             gap: 12px;
             margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
         }
 
-        .modal-footer button {
+        .modal-action-btn {
             flex: 1;
-            padding: 12px;
+            padding: 12px 16px;
             border: none;
             border-radius: var(--radius-sm);
-            cursor: pointer;
             font-weight: 600;
+            cursor: pointer;
             font-family: inherit;
             font-size: 14px;
+            transition: all 0.2s;
         }
 
-        .modal-footer .btn-primary {
+        .modal-action-btn.primary {
             background: var(--coral);
             color: var(--white);
         }
 
-        .modal-footer .btn-primary:hover {
+        .modal-action-btn.primary:hover {
             background: var(--coral-dark);
         }
 
-        .modal-footer .btn-secondary {
+        .modal-action-btn.secondary {
             background: var(--cream);
             color: var(--slate);
             border: 1px solid var(--border);
         }
 
-        .modal-footer .btn-secondary:hover {
-            background: #f0e8df;
+        .modal-action-btn.secondary:hover {
+            border-color: var(--coral);
+            color: var(--coral);
         }
 
         /* ========== CART DRAWER ========== */
@@ -566,17 +925,34 @@
             right: -400px;
             top: 0;
             width: 400px;
+            max-width: 90vw;
             height: 100vh;
             background: var(--white);
-            box-shadow: -2px 0 20px rgba(0,0,0,0.1);
-            transition: right 0.3s;
+            box-shadow: var(--shadow-lg);
             z-index: 999;
+            transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             flex-direction: column;
         }
 
-        .cart-drawer.open {
+        .cart-drawer.active {
             right: 0;
+        }
+
+        .cart-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            z-index: 998;
+        }
+
+        .cart-overlay.active {
+            display: block;
         }
 
         .cart-header {
@@ -587,7 +963,20 @@
             align-items: center;
         }
 
-        .cart-body {
+        .cart-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .cart-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--stone);
+        }
+
+        .cart-items {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
@@ -596,70 +985,84 @@
         .cart-item {
             display: flex;
             gap: 12px;
-            padding: 12px 0;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
             border-bottom: 1px solid var(--border);
         }
 
         .cart-item-emoji {
-            font-size: 48px;
+            font-size: 40px;
             flex-shrink: 0;
         }
 
         .cart-item-info {
             flex: 1;
+            min-width: 0;
         }
 
         .cart-item-name {
             font-weight: 600;
-            font-size: 14px;
+            margin-bottom: 4px;
+            color: var(--slate);
         }
 
         .cart-item-price {
             color: var(--coral);
             font-weight: 700;
-            margin: 4px 0;
+            margin-bottom: 8px;
         }
 
-        .cart-item-controls {
+        .cart-item-qty {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-top: 8px;
+            font-size: 13px;
         }
 
         .qty-btn {
             background: var(--cream);
             border: none;
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
+            transition: all 0.2s;
         }
 
         .qty-btn:hover {
             background: var(--border);
         }
 
-        .qty-display {
-            font-weight: 600;
-            min-width: 30px;
+        .cart-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
             text-align: center;
+            padding: 40px 20px;
         }
 
-        .cart-remove {
-            background: none;
-            border: none;
-            color: var(--coral);
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            margin-left: auto;
+        .cart-empty-emoji {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .cart-empty h3 {
+            margin-bottom: 8px;
+            color: var(--slate);
+        }
+
+        .cart-empty p {
+            color: var(--stone);
+            font-size: 14px;
         }
 
         .cart-footer {
             padding: 20px;
             border-top: 1px solid var(--border);
+            background: var(--cream);
         }
 
         .cart-total {
@@ -668,85 +1071,93 @@
             font-size: 18px;
             font-weight: 700;
             margin-bottom: 16px;
+            color: var(--slate);
+        }
+
+        .cart-total-value {
+            color: var(--coral);
         }
 
         .cart-checkout {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             background: var(--coral);
             color: var(--white);
             border: none;
             border-radius: var(--radius-sm);
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
             font-family: inherit;
+            font-size: 14px;
+            transition: all 0.2s;
         }
 
         .cart-checkout:hover {
             background: var(--coral-dark);
         }
 
-        .cart-empty {
-            text-align: center;
-            color: var(--stone);
-            padding: 40px 20px;
-        }
-
-        @media (max-width: 768px) {
-            .cart-drawer {
-                width: 100%;
-                right: -100%;
-            }
-        }
-
         /* ========== FEATURES STRIP ========== */
         .features-strip {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 40px 24px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            padding: 60px 24px;
             background: var(--cream);
-            margin: 40px 0;
+            max-width: 1400px;
+            margin: 60px auto;
         }
 
         .feature {
+            background: var(--white);
+            padding: 24px;
+            border-radius: var(--radius);
             text-align: center;
+            border: 1px solid rgba(232, 224, 216, 0.6);
+            transition: all 0.3s;
+        }
+
+        .feature:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
         }
 
         .feature-icon {
-            font-size: 36px;
-            margin-bottom: 12px;
+            font-size: 40px;
+            margin-bottom: 16px;
         }
 
         .feature-title {
             font-weight: 700;
             margin-bottom: 8px;
+            color: var(--slate);
         }
 
         .feature-desc {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--stone);
+            line-height: 1.5;
         }
 
         /* ========== FOOTER ========== */
         .footer {
             background: var(--slate);
             color: var(--white);
-            padding: 40px 24px;
-            margin-top: 60px;
+            padding: 60px 24px 30px;
+            margin-top: 80px;
         }
 
         .footer-content {
             max-width: 1400px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
         }
 
         .footer-section h4 {
             margin-bottom: 16px;
+            font-weight: 700;
             font-size: 16px;
         }
 
@@ -754,12 +1165,14 @@
             list-style: none;
         }
 
+        .footer-section li {
+            margin-bottom: 10px;
+        }
+
         .footer-section a {
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             font-size: 14px;
-            display: block;
-            margin-bottom: 8px;
             transition: color 0.2s;
         }
 
@@ -767,12 +1180,84 @@
             color: var(--coral);
         }
 
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--coral);
+            margin-bottom: 8px;
+        }
+
         .footer-bottom {
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 24px;
             text-align: center;
-            font-size: 14px;
-            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* ========== MOBILE BOTTOM NAV ========== */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            z-index: 98;
+        }
+
+        .bottom-nav.active {
+            display: flex;
+        }
+
+        .bottom-nav-items {
+            display: flex;
+            width: 100%;
+            gap: 0;
+        }
+
+        .bottom-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--stone);
+            text-decoration: none;
+            font-size: 11px;
+            gap: 4px;
+            border: none;
+            background: none;
+            font-family: inherit;
+        }
+
+        .bottom-nav-item:hover,
+        .bottom-nav-item.active {
+            color: var(--coral);
+        }
+
+        .bottom-nav-icon {
+            font-size: 24px;
+        }
+
+        .bottom-nav-badge {
+            position: absolute;
+            top: 2px;
+            right: 8px;
+            background: var(--coral);
+            color: var(--white);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
         }
 
         /* ========== TOAST NOTIFICATIONS ========== */
@@ -784,12 +1269,13 @@
             color: var(--white);
             padding: 16px 20px;
             border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
             z-index: 2000;
-            animation: slideIn 0.3s ease;
+            animation: slideInToast 0.3s ease-out;
+            max-width: 300px;
         }
 
-        @keyframes slideIn {
+        @keyframes slideInToast {
             from {
                 transform: translateX(400px);
                 opacity: 0;
@@ -800,400 +1286,489 @@
             }
         }
 
-        /* ========== AUTH MODALS ========== */
-        .auth-form {
-            padding: 24px;
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .navbar-search {
+                max-width: 300px;
+                margin: 0 16px;
+            }
         }
 
-        .auth-form h3 {
-            margin-bottom: 20px;
-            font-size: 24px;
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 16px;
+            }
+
+            .navbar-search {
+                display: none;
+            }
+
+            .navbar-actions {
+                gap: 8px;
+            }
+
+            .nav-btn {
+                padding: 6px 8px;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 16px;
+            }
+
+            .hero {
+                padding: 24px 16px;
+            }
+
+            .product-emoji {
+                height: 140px;
+                font-size: 56px;
+            }
+
+            .featured-carousel {
+                padding: 24px 16px;
+            }
+
+            .carousel-card {
+                flex: 0 0 240px;
+            }
+
+            .carousel-header {
+                margin-bottom: 16px;
+            }
+
+            .category-nav {
+                padding: 16px;
+            }
+
+            .filters-section {
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .cart-drawer {
+                width: 100%;
+                right: -100%;
+            }
+
+            .features-strip {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+                padding: 40px 16px;
+                margin: 40px auto;
+            }
+
+            .footer-content {
+                gap: 24px;
+            }
+
+            .bottom-nav {
+                display: flex;
+            }
+
+            body {
+                padding-bottom: 60px;
+            }
         }
 
-        .form-group {
-            margin-bottom: 16px;
+        @media (max-width: 480px) {
+            .navbar-brand {
+                font-size: 18px;
+            }
+
+            .navbar-actions .nav-btn:nth-child(n+2) {
+                display: none;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+            }
+
+            .product-card {
+                border-radius: 12px;
+            }
+
+            .product-emoji {
+                height: 120px;
+                font-size: 48px;
+            }
+
+            .product-name {
+                font-size: 13px;
+            }
+
+            .product-desc {
+                font-size: 11px;
+            }
+
+            .hero-right {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-card {
+                min-height: 100px;
+            }
+
+            .features-strip {
+                grid-template-columns: 1fr;
+                padding: 32px 16px;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-group select {
+                width: 100%;
+            }
+
+            .modal-content {
+                border-radius: 16px;
+            }
+
+            .cart-drawer {
+                width: 100%;
+            }
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            font-size: 14px;
+        /* ========== ANIMATIONS ========== */
+        @keyframes shimmer {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
         }
 
-        .form-group input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-family: inherit;
-            font-size: 14px;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--coral);
-            box-shadow: 0 0 0 3px rgba(232, 85, 58, 0.1);
-        }
-
-        .form-submit {
-            width: 100%;
-            padding: 12px;
-            background: var(--coral);
-            color: var(--white);
-            border: none;
-            border-radius: var(--radius-sm);
-            font-weight: 700;
-            cursor: pointer;
-            font-family: inherit;
-            margin-top: 20px;
-        }
-
-        .form-submit:hover {
-            background: var(--coral-dark);
-        }
-
-        .form-toggle {
-            text-align: center;
-            margin-top: 16px;
-            font-size: 14px;
-        }
-
-        .form-toggle a {
-            color: var(--coral);
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        /* ========== PAGE SECTIONS ========== */
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        .page-header {
-            padding: 40px 24px;
-            background: var(--cream);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .page-header h1 {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .page-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 24px;
-        }
-
-        .favorites-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 20px;
-        }
-
-        .orders-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .order-card {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px;
-        }
-
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .order-id {
-            font-weight: 700;
-            color: var(--slate);
-        }
-
-        .order-date {
-            color: var(--stone);
-            font-size: 14px;
-        }
-
-        .order-items {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 12px;
-        }
-
-        .order-item-tag {
-            font-size: 12px;
-            background: var(--cream);
-            padding: 6px 12px;
-            border-radius: 4px;
-        }
-
-        .order-total {
-            font-weight: 700;
-            color: var(--coral);
-            font-size: 18px;
-        }
-
-        .offline-indicator {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: var(--stone);
-            color: var(--white);
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border);
-            border-top-color: var(--coral);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .loading {
+            animation: shimmer 1.5s infinite;
         }
     </style>
 </head>
 <body>
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <a class="navbar-brand" href="#" data-page="home">Hacemo</a>
-        <div class="navbar-search">
-            <input type="text" id="searchInput" placeholder="Search products...">
-        </div>
-        <div class="navbar-actions">
-            <button class="nav-btn" id="langToggle">🌐 EN</button>
-            <button class="nav-btn" id="currencyToggle">$ USD</button>
-            <button class="nav-btn nav-btn-icon" id="favoritesBtn" data-page="favorites">❤️</button>
-            <button class="nav-btn nav-btn-icon" id="accountBtn" data-page="account">👤</button>
-            <button class="nav-btn nav-btn-icon" id="cartBtn">
-                🛒
-                <span class="cart-badge" id="cartBadge" style="display:none">0</span>
-            </button>
-        </div>
-    </nav>
 
-    <!-- CART DRAWER -->
-    <div class="cart-drawer" id="cartDrawer">
-        <div class="cart-header">
-            <h2>Shopping Cart</h2>
-            <button class="modal-close" id="cartClose">✕</button>
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+    <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <a href="#" class="navbar-brand">Hacemo</a>
+    <div class="navbar-search">
+        <input type="text" id="searchInput" placeholder="Search products...">
+    </div>
+    <div class="navbar-actions">
+        <button class="nav-btn" id="favBtn">
+            <span class="nav-btn-icon">❤️</span>
+            <span>Favorites</span>
+        </button>
+        <button class="nav-btn" id="accountBtn">
+            <span class="nav-btn-icon">👤</span>
+            <span>Account</span>
+        </button>
+        <button class="nav-btn" id="cartBtn">
+            <span class="nav-btn-icon">🛒</span>
+            <span>Cart</span>
+            <span class="cart-badge" id="cartBadge" style="display:none;">0</span>
+        </button>
+    </div>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<div class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-content">
+        <div class="drawer-section">
+            <input type="text" id="mobileSearch" placeholder="Search products..." style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: inherit;">
         </div>
-        <div class="cart-body" id="cartItems"></div>
-        <div class="cart-footer">
-            <div class="cart-total">
-                <span>Total:</span>
-                <span id="cartTotal">$0.00</span>
-            </div>
-            <button class="cart-checkout" id="checkoutBtn">Checkout</button>
+        <div class="drawer-section">
+            <h3>Categories</h3>
+            <div id="mobileCategories"></div>
+        </div>
+        <div class="drawer-section">
+            <h3>Settings</h3>
+            <a href="#" class="drawer-link" id="langToggle">English / Español</a>
+            <a href="#" class="drawer-link" id="currencyToggle">USD / MXN</a>
+        </div>
+        <div class="drawer-section">
+            <a href="#" class="drawer-link" id="drawerFav">Favorites</a>
+            <a href="#" class="drawer-link" id="drawerAccount">Account</a>
         </div>
     </div>
+</div>
 
-    <!-- HOME PAGE -->
-    <div class="page active" id="homePage">
-        <!-- HERO -->
-        <div class="hero">
-            <h1 id="heroTitle">We make it real.</h1>
-            <p id="heroSubtitle">Professional 3D printing at scale</p>
-            <div class="category-quick-links" id="heroCategories"></div>
-        </div>
-
-        <!-- CATEGORY PILLS -->
-        <div class="category-pills" id="categoryPills"></div>
-
-        <!-- FILTERS -->
-        <div class="filters-section">
-            <div class="filter-group">
-                <label for="subcategoryFilter">Subcategory:</label>
-                <select id="subcategoryFilter">
-                    <option value="">All Subcategories</option>
-                </select>
+<!-- HERO SECTION -->
+<section class="hero">
+    <div class="hero-left">
+        <h1>We make it real.</h1>
+        <p>Professional 3D printing at scale. From custom gifts to industrial prototypes, Hacemo brings your ideas to life.</p>
+        <button class="hero-cta" onclick="document.querySelector('.category-nav').scrollIntoView({behavior: 'smooth'})">Browse Products</button>
+        <div class="hero-trust">
+            <div class="trust-badge">
+                <span class="trust-badge-icon">⭐</span>
+                <span>Premium Quality</span>
             </div>
-            <div class="filter-group">
-                <label for="sortBy">Sort by:</label>
-                <select id="sortBy">
-                    <option value="newest">Newest</option>
-                    <option value="name">Name (A-Z)</option>
-                    <option value="price-low">Price (Low to High)</option>
-                    <option value="price-high">Price (High to Low)</option>
-                    <option value="rating">Rating</option>
-                </select>
+            <div class="trust-badge">
+                <span class="trust-badge-icon">🚚</span>
+                <span>Fast Delivery</span>
             </div>
-        </div>
-
-        <!-- PRODUCTS GRID -->
-        <div class="products-section">
-            <div class="products-grid" id="productsGrid"></div>
-        </div>
-
-        <!-- FEATURES STRIP -->
-        <div class="features-strip">
-            <div class="feature">
-                <div class="feature-icon">⭐</div>
-                <div class="feature-title">Premium Quality</div>
-                <div class="feature-desc">Professional-grade prints with perfect finishes</div>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🚚</div>
-                <div class="feature-title">Fast Delivery</div>
-                <div class="feature-desc">Quick turnaround, reliable shipping worldwide</div>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🎨</div>
-                <div class="feature-title">Custom Orders</div>
-                <div class="feature-desc">Design services and custom printing available</div>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">💬</div>
-                <div class="feature-title">Expert Support</div>
-                <div class="feature-desc">Dedicated team ready to help 24/7</div>
+            <div class="trust-badge">
+                <span class="trust-badge-icon">🎨</span>
+                <span>Custom Orders</span>
             </div>
         </div>
     </div>
-
-    <!-- FAVORITES PAGE -->
-    <div class="page" id="favoritesPage">
-        <div class="page-header">
-            <h1 id="favTitle">My Favorites</h1>
+    <div class="hero-right">
+        <div class="hero-card">
+            <div class="hero-card-emoji">🔑</div>
+            <div class="hero-card-text">Custom Keychains</div>
         </div>
-        <div class="page-content">
-            <div class="favorites-grid" id="favoritesGrid"></div>
+        <div class="hero-card">
+            <div class="hero-card-emoji">🏠</div>
+            <div class="hero-card-text">Home Decor</div>
         </div>
-    </div>
-
-    <!-- ACCOUNT PAGE -->
-    <div class="page" id="accountPage">
-        <div class="page-header">
-            <h1 id="accountTitle">My Account</h1>
+        <div class="hero-card">
+            <div class="hero-card-emoji">💻</div>
+            <div class="hero-card-text">Tech Gadgets</div>
         </div>
-        <div class="page-content" id="accountContent"></div>
-    </div>
-
-    <!-- CUSTOM ORDER PAGE -->
-    <div class="page" id="customPage">
-        <div class="page-header">
-            <h1>Custom Order Form</h1>
-        </div>
-        <div class="page-content" style="max-width: 600px;">
-            <form id="customOrderForm">
-                <div class="form-group">
-                    <label for="customName">Full Name</label>
-                    <input type="text" id="customName" required>
-                </div>
-                <div class="form-group">
-                    <label for="customEmail">Email</label>
-                    <input type="email" id="customEmail" required>
-                </div>
-                <div class="form-group">
-                    <label for="customDesc">Project Description</label>
-                    <textarea style="width:100%; padding:10px; border:1px solid var(--border); border-radius:var(--radius-sm); font-family:inherit;" rows="4" id="customDesc" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="customMaterial">Material Preference</label>
-                    <input type="text" id="customMaterial" placeholder="e.g., PLA, PETG, Nylon">
-                </div>
-                <div class="form-group">
-                    <label for="customQty">Quantity</label>
-                    <input type="number" id="customQty" value="1" min="1">
-                </div>
-                <div class="form-group">
-                    <label for="customBudget">Budget (USD)</label>
-                    <input type="number" id="customBudget" placeholder="0.00" step="0.01">
-                </div>
-                <button type="submit" class="form-submit">Submit Custom Order Request</button>
-            </form>
+        <div class="hero-card">
+            <div class="hero-card-emoji">🏭</div>
+            <div class="hero-card-text">Industrial Parts</div>
         </div>
     </div>
+</section>
 
-    <!-- PRODUCT DETAIL MODAL -->
-    <div class="modal" id="productModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalProductName"></h2>
-                <button class="modal-close" id="modalClose">✕</button>
+<!-- FEATURED CAROUSEL -->
+<section class="featured-carousel">
+    <div class="carousel-header">
+        <h2>Featured & Trending</h2>
+        <p>Discover our most popular and newly trending 3D printed products</p>
+    </div>
+    <div class="carousel-container" id="carousel"></div>
+</section>
+
+<!-- CATEGORY NAVIGATION -->
+<nav class="category-nav">
+    <div class="category-pills" id="categoryPills"></div>
+</nav>
+
+<!-- FILTERS & SORT -->
+<div class="filters-section">
+    <div class="filters-left">
+        <div class="filter-group">
+            <label for="sortSelect">Sort by:</label>
+            <select id="sortSelect">
+                <option value="newest">Newest</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Highest Rated</option>
+                <option value="trending">Trending</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="materialSelect">Material:</label>
+            <select id="materialSelect">
+                <option value="">All Materials</option>
+                <option value="pla">PLA</option>
+                <option value="petg">PETG</option>
+                <option value="tpu">TPU</option>
+                <option value="silk">Silk</option>
+                <option value="carbon">Carbon Fiber</option>
+                <option value="nylon">Nylon</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="priceSelect">Price:</label>
+            <select id="priceSelect">
+                <option value="">All Prices</option>
+                <option value="0-20">Under $20</option>
+                <option value="20-50">$20 - $50</option>
+                <option value="50-100">$50 - $100</option>
+                <option value="100">Over $100</option>
+            </select>
+        </div>
+    </div>
+    <div class="result-count" id="resultCount">Showing products</div>
+</div>
+
+<!-- PRODUCTS SECTION -->
+<section class="products-section">
+    <div class="products-grid" id="productsGrid"></div>
+</section>
+
+<!-- FEATURES STRIP -->
+<section class="features-strip">
+    <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">Fast Printing</div>
+        <div class="feature-desc">From order to delivery in 1-3 weeks depending on complexity</div>
+    </div>
+    <div class="feature">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-title">Premium Quality</div>
+        <div class="feature-desc">Professional grade materials and finishing for every project</div>
+    </div>
+    <div class="feature">
+        <div class="feature-icon">🔧</div>
+        <div class="feature-title">Full Customization</div>
+        <div class="feature-desc">Design, color, materials, and size customization available</div>
+    </div>
+    <div class="feature">
+        <div class="feature-icon">💬</div>
+        <div class="feature-title">Expert Support</div>
+        <div class="feature-desc">24/7 chat support and design consultation included</div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <div class="footer-logo">Hacemo</div>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.6;">Professional 3D printing marketplace bringing ideas to life with quality and scale.</p>
+        </div>
+        <div class="footer-section">
+            <h4>Shop</h4>
+            <ul>
+                <li><a href="#">Toys & Fidgets</a></li>
+                <li><a href="#">Home & Living</a></li>
+                <li><a href="#">Tech & Gadgets</a></li>
+                <li><a href="#">Industrial</a></li>
+                <li><a href="#">Custom Orders</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Customer Service</h4>
+            <ul>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Contact</a></li>
+                <li><a href="#">Shipping Info</a></li>
+                <li><a href="#">Returns</a></li>
+                <li><a href="#">FAQ</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Connect</h4>
+            <ul>
+                <li><a href="#">Instagram</a></li>
+                <li><a href="#">Twitter</a></li>
+                <li><a href="#">Discord</a></li>
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">Newsletter</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 Hacemo. All rights reserved. | <a href="#" style="color: inherit;">Privacy</a> | <a href="#" style="color: inherit;">Terms</a></p>
+    </div>
+</footer>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="bottom-nav" id="bottomNav">
+    <button class="bottom-nav-item" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <span class="bottom-nav-icon">🏠</span>
+        <span>Home</span>
+    </button>
+    <button class="bottom-nav-item" onclick="document.getElementById('searchInput').focus()">
+        <span class="bottom-nav-icon">🔍</span>
+        <span>Search</span>
+    </button>
+    <button class="bottom-nav-item" id="mobileFavBtn">
+        <span class="bottom-nav-icon">❤️</span>
+        <span>Favorites</span>
+    </button>
+    <button class="bottom-nav-item" id="mobileCartBtn">
+        <span class="bottom-nav-icon">🛒</span>
+        <span>Cart</span>
+        <span class="bottom-nav-badge" id="mobileCartBadge" style="display:none;">0</span>
+    </button>
+</nav>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+        <h2>Shopping Cart</h2>
+        <button class="cart-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+        <div class="cart-empty">
+            <div class="cart-empty-emoji">🛒</div>
+            <h3>Cart is empty</h3>
+            <p>Start adding products to get started!</p>
+        </div>
+    </div>
+    <div class="cart-footer">
+        <div class="cart-total">
+            <span>Total:</span>
+            <span class="cart-total-value" id="cartTotal">$0.00</span>
+        </div>
+        <button class="cart-checkout" onclick="checkout()">Checkout</button>
+    </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal" id="productModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Product Details</h2>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-emoji" id="modalEmoji"></div>
+        <div class="modal-body">
+            <h2 id="modalName"></h2>
+            <p id="modalDesc"></p>
+            <div class="modal-specs">
+                <div class="modal-specs-row">
+                    <span class="modal-specs-label">Price:</span>
+                    <span class="modal-specs-value" id="modalPrice"></span>
+                </div>
+                <div class="modal-specs-row">
+                    <span class="modal-specs-label">Print Time:</span>
+                    <span class="modal-specs-value" id="modalTime"></span>
+                </div>
+                <div class="modal-specs-row">
+                    <span class="modal-specs-label">Weight:</span>
+                    <span class="modal-specs-value" id="modalWeight"></span>
+                </div>
+                <div class="modal-specs-row">
+                    <span class="modal-specs-label">Rating:</span>
+                    <span class="modal-specs-value" id="modalRating"></span>
+                </div>
             </div>
-            <div class="modal-emoji" id="modalEmoji"></div>
-            <div class="modal-body">
-                <p id="modalDescription"></p>
-                <div class="modal-specs" id="modalSpecs"></div>
-                <div class="modal-materials" id="modalMaterials"></div>
-                <div class="modal-footer">
-                    <button class="modal-footer button btn-secondary" id="modalCancel">Cancel</button>
-                    <button class="modal-footer button btn-primary" id="modalAddCart">Add to Cart</button>
-                </div>
+            <div class="modal-materials">
+                <h4>Available Materials</h4>
+                <div class="material-chips" id="modalMaterials"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-action-btn secondary" onclick="closeModal()">Close</button>
+                <button class="modal-action-btn primary" id="modalAddCart">Add to Cart</button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- LOGIN MODAL -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <div class="auth-form">
-                <h3 id="authTitle">Login</h3>
-                <form id="authForm">
-                    <div class="form-group">
-                        <label for="authEmail">Email</label>
-                        <input type="email" id="authEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="authPassword">Password</label>
-                        <input type="password" id="authPassword" required>
-                    </div>
-                    <button type="submit" class="form-submit" id="authSubmit">Login</button>
-                </form>
-                <div class="form-toggle">
-                    <span id="toggleText">Don't have an account? <a id="toggleAuth">Register</a></span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- OFFLINE INDICATOR -->
-    <div class="offline-indicator" id="offlineIndicator" style="display:none">
-        Using offline data (API unavailable)
-    </div>
-
-    <script>
+<script>
         // ============================================================================
-        // DATA & STATE
+        // STATE MANAGEMENT
         // ============================================================================
 
-        const EXCHANGE_RATE = 17.1;
-        const API_URL = 'http://127.0.0.1:3001';
-
-        let appState = {
-            currentLang: 'en',
-            currentCurrency: 'usd',
-            cart: [],
-            favorites: [],
-            user: null,
-            currentPage: 'home',
-            isOffline: false,
+        const appState = {
             products: [],
             categories: [],
             subcategories: [],
-            selectedCategory: null,
+            currentLang: localStorage.getItem('lang') || 'en',
+            currentCurrency: localStorage.getItem('currency') || 'USD',
+            cart: [],
+            favorites: [],
+            users: {},
+            currentUser: null,
+            orders: [],
         };
 
-        // Translations
         const translations = {
             en: {
                 heroTitle: "We make it real.",
@@ -1251,7 +1826,6 @@
             }
         };
 
-        // Product Data
         const PRODUCTS = [
             { id: "prod-001", name: "Custom Name Keychain", category: "consumer", subcategory_id: "keychains", price: 8, description: "Personalized keychain with any name or text. Durable PLA with smooth finish.", emoji: "🔑", rating: 4.8, review_count: 142, print_time: "30 min", weight: "5g", trending: 1, featured: 1, materials: ["pla","silk","petg"], tags: ["keychain","custom","gift"] },
             { id: "prod-002", name: "Logo Keychain (Bulk)", category: "consumer", subcategory_id: "keychains", price: 5, description: "Custom logo keychains for businesses. Min order 20 units.", emoji: "🏷️", rating: 4.9, review_count: 89, print_time: "25 min", weight: "4g", trending: 1, featured: 0, materials: ["pla","silk"], tags: ["keychain","logo","business"] },
@@ -1262,7 +1836,7 @@
             { id: "prod-003", name: "Fidget Spinner Pro", category: "consumer", subcategory_id: "toys-fidgets", price: 15, description: "Premium ball-bearing fidget spinner. Smooth rotation.", emoji: "🔄", rating: 4.7, review_count: 203, print_time: "1.5 hr", weight: "12g", trending: 0, featured: 1, materials: ["pla","petg","silk"], tags: ["fidget","toy","desk"] },
             { id: "prod-004", name: "Fidget Cube", category: "consumer", subcategory_id: "toys-fidgets", price: 15, description: "Six-sided fidget cube with click, spin, flip, roll features.", emoji: "🎲", rating: 4.6, review_count: 167, print_time: "2 hr", weight: "15g", trending: 0, featured: 0, materials: ["pla","tpu"], tags: ["fidget","toy","stress"] },
             { id: "prod-005", name: "Articulated Dragon", category: "consumer", subcategory_id: "toys-fidgets", price: 22, description: "Fully articulated dragon. Print-in-place design.", emoji: "🐉", rating: 4.9, review_count: 312, print_time: "3 hr", weight: "40g", trending: 1, featured: 1, materials: ["pla","silk"], tags: ["articulated","dragon","toy"] },
-            { id: "prod-025", name: "Articulated Snake", category: "consumer", subcategory_id: "toys-fidgets", price: 18, description: "Slithering snake with 30+ joints. Fun desk toy.", emoji: "🐉", rating: 4.7, review_count: 145, print_time: "2.5 hr", weight: "35g", trending: 0, featured: 0, materials: ["pla","silk","tpu"], tags: ["articulated","snake","toy"] },
+            { id: "prod-025", name: "Articulated Snake", category: "consumer", subcategory_id: "toys-fidgets", price: 18, description: "Slithering snake with 30+ joints. Fun desk toy.", emoji: "🐢", rating: 4.7, review_count: 145, print_time: "2.5 hr", weight: "35g", trending: 0, featured: 0, materials: ["pla","silk","tpu"], tags: ["articulated","snake","toy"] },
             { id: "prod-026", name: "Flexi Rex", category: "consumer", subcategory_id: "toys-fidgets", price: 20, description: "Print-in-place T-Rex that flexes and roars.", emoji: "🦕", rating: 4.8, review_count: 278, print_time: "2.5 hr", weight: "38g", trending: 1, featured: 0, materials: ["pla","silk"], tags: ["articulated","dinosaur","toy"] },
             { id: "prod-027", name: "Infinity Cube", category: "consumer", subcategory_id: "toys-fidgets", price: 14, description: "Folding infinity cube. Addictive fidget toy.", emoji: "♾️", rating: 4.5, review_count: 98, print_time: "1.5 hr", weight: "20g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["fidget","cube","toy"] },
             { id: "prod-028", name: "Stress Ball Cage", category: "consumer", subcategory_id: "toys-fidgets", price: 12, description: "Geometric cage holds standard stress ball. Desk art.", emoji: "⚽", rating: 4.3, review_count: 67, print_time: "1 hr", weight: "15g", trending: 0, featured: 0, materials: ["pla","tpu"], tags: ["stress","desk","toy"] },
@@ -1272,91 +1846,88 @@
             { id: "prod-032", name: "Anime Cat Figure", category: "consumer", subcategory_id: "figurines", price: 28, description: "Cute manga-style cat figure. Multiple poses available.", emoji: "🐱", rating: 4.7, review_count: 156, print_time: "3 hr", weight: "45g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["anime","cat","figure"] },
             { id: "prod-033", name: "Mythical Phoenix", category: "consumer", subcategory_id: "figurines", price: 40, description: "Rising phoenix statue with flame detail. 8 inch wingspan.", emoji: "🦅", rating: 4.8, review_count: 61, print_time: "6 hr", weight: "90g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["phoenix","statue","mythical"] },
             { id: "prod-034", name: "Geometric Animal Set", category: "consumer", subcategory_id: "figurines", price: 30, description: "Low-poly animal trio: bear, deer, wolf. Shelf decor.", emoji: "🐰", rating: 4.6, review_count: 73, print_time: "4 hr", weight: "60g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["geometric","animal","lowpoly"] },
-            { id: "prod-035", name: "Dice Tower", category: "consumer", subcategory_id: "games", price: 25, description: "Gothic-style dice tower. Fair rolls every time.", emoji: "🎯", rating: 4.8, review_count: 134, print_time: "3 hr", weight: "60g", trending: 1, featured: 0, materials: ["pla","petg"], tags: ["dice","dnd","tabletop"] },
-            { id: "prod-036", name: "Puzzle Box", category: "consumer", subcategory_id: "games", price: 22, description: "Multi-step puzzle box. Hidden compartment inside.", emoji: "🧩", rating: 4.7, review_count: 87, print_time: "3 hr", weight: "50g", trending: 0, featured: 0, materials: ["pla"], tags: ["puzzle","brain","gift"] },
-            { id: "prod-037", name: "Board Game Insert (Catan)", category: "consumer", subcategory_id: "games", price: 20, description: "Custom organizer insert for Settlers of Catan.", emoji: "🎮", rating: 4.6, review_count: 45, print_time: "4 hr", weight: "80g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["boardgame","catan","organizer"] },
-            { id: "prod-038", name: "Card Deck Holder", category: "consumer", subcategory_id: "games", price: 15, description: "Holds 2 decks. Magnetic lid. Travel-friendly.", emoji: "🎰", rating: 4.5, review_count: 92, print_time: "2 hr", weight: "25g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["cards","holder","travel"] },
-            { id: "prod-039", name: "Game Token Set (50pc)", category: "consumer", subcategory_id: "games", price: 18, description: "Custom game tokens in 5 colors. Compatible with popular games.", emoji: "●", rating: 4.4, review_count: 56, print_time: "3 hr", weight: "40g", trending: 0, featured: 0, materials: ["pla"], tags: ["tokens","boardgame","gaming"] },
-            { id: "prod-040", name: "Maze Ball Puzzle", category: "consumer", subcategory_id: "games", price: 16, description: "3D-printed maze ball. Tilt to navigate.", emoji: "🌐", rating: 4.5, review_count: 78, print_time: "2 hr", weight: "30g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["maze","puzzle","toy"] },
-            { id: "prod-007", name: "Geometric Planter", category: "home", subcategory_id: "planters", price: 22, description: "Modern geometric planter with drainage. Perfect for succulents.", emoji: "🌿", rating: 4.7, review_count: 78, print_time: "3 hr", weight: "80g", trending: 0, featured: 0, materials: ["pla","petg","silk"], tags: ["planter","geometric","succulent"] },
-            { id: "prod-045", name: "Self-Watering Planter", category: "home", subcategory_id: "planters", price: 28, description: "Built-in water reservoir. Water once a week.", emoji: "💧", rating: 4.8, review_count: 65, print_time: "4 hr", weight: "100g", trending: 0, featured: 1, materials: ["pla","petg"], tags: ["planter","self-watering","indoor"] },
-            { id: "prod-046", name: "Wall-Mount Planter Set", category: "home", subcategory_id: "planters", price: 24, description: "Set of 3 wall-mounted planters. Minimalist design.", emoji: "🌿", rating: 4.6, review_count: 34, print_time: "3 hr", weight: "70g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["planter","wall","set"] },
-            { id: "prod-047", name: "Succulent Pot Set (3pk)", category: "home", subcategory_id: "planters", price: 18, description: "Three tiny pots for succulents. Cute faces design.", emoji: "🌿", rating: 4.9, review_count: 112, print_time: "2 hr", weight: "45g", trending: 1, featured: 0, materials: ["pla","silk"], tags: ["succulent","pot","cute"] },
-            { id: "prod-048", name: "Herb Garden Labels (10pk)", category: "home", subcategory_id: "planters", price: 10, description: "Weatherproof garden markers. 10 common herbs included.", emoji: "🌿", rating: 4.5, review_count: 45, print_time: "1 hr", weight: "15g", trending: 0, featured: 0, materials: ["petg","pla"], tags: ["garden","labels","herbs"] },
-            { id: "prod-049", name: "Hanging Planter", category: "home", subcategory_id: "planters", price: 26, description: "Macramé-style hanging planter with built-in drainage.", emoji: "🌿", rating: 4.7, review_count: 29, print_time: "3.5 hr", weight: "85g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["planter","hanging","boho"] },
-            { id: "prod-011", name: "Wall-Mount Plant Shelf", category: "home", subcategory_id: "planters", price: 18, description: "Minimalist floating wall shelf for small plants.", emoji: "🌿", rating: 4.4, review_count: 43, print_time: "2.5 hr", weight: "60g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["shelf","wall","plant"] },
-            { id: "prod-009", name: "Cable Management Clips (10pk)", category: "home", subcategory_id: "organization", price: 14, description: "Adhesive-backed cable clips. Pack of 10.", emoji: "🔌", rating: 4.5, review_count: 134, print_time: "45 min", weight: "20g", trending: 0, featured: 0, materials: ["pla","petg","tpu"], tags: ["cable","clips","organization"] },
-            { id: "prod-050", name: "Drawer Divider Set", category: "home", subcategory_id: "organization", price: 20, description: "Adjustable drawer dividers. Fits standard drawers.", emoji: "📏", rating: 4.6, review_count: 56, print_time: "3 hr", weight: "60g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["drawer","divider","organizer"] },
-            { id: "prod-008", name: "Desk Organizer Pro", category: "home", subcategory_id: "organization", price: 28, description: "Modular desk organizer with pen holder, phone stand, card slot.", emoji: "📦", rating: 4.6, review_count: 56, print_time: "4 hr", weight: "120g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["desk","organizer","office"] },
-            { id: "prod-051", name: "Remote Control Holder", category: "home", subcategory_id: "organization", price: 16, description: "Holds 4 remotes. Couch armrest design.", emoji: "📺", rating: 4.5, review_count: 41, print_time: "2 hr", weight: "40g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["remote","holder","living room"] },
-            { id: "prod-052", name: "Spice Rack (Wall Mount)", category: "home", subcategory_id: "organization", price: 24, description: "Wall-mounted spice rack. Holds 8 standard jars.", emoji: "⬜", rating: 4.7, review_count: 33, print_time: "4 hr", weight: "90g", trending: 0, featured: 0, materials: ["petg","pla"], tags: ["spice","rack","kitchen"] },
-            { id: "prod-053", name: "Wall Hook Set (6pk)", category: "home", subcategory_id: "organization", price: 14, description: "Minimalist wall hooks. Self-adhesive backing.", emoji: "➡️", rating: 4.4, review_count: 78, print_time: "1.5 hr", weight: "25g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["hooks","wall","organization"] },
-            { id: "prod-054", name: "Under-Desk Cable Tray", category: "home", subcategory_id: "organization", price: 18, description: "Hide cables under your desk. Easy install.", emoji: "🔌", rating: 4.6, review_count: 47, print_time: "2.5 hr", weight: "50g", trending: 0, featured: 0, materials: ["petg","pla"], tags: ["cable","desk","tray"] },
-            { id: "prod-006", name: "Lithophane Photo Frame", category: "home", subcategory_id: "decor", price: 30, description: "Turn any photo into a stunning 3D lithophane. Includes LED base.", emoji: "🖼️", rating: 4.8, review_count: 95, print_time: "4 hr", weight: "50g", trending: 0, featured: 0, materials: ["pla"], tags: ["lithophane","photo","decor"] },
-            { id: "prod-055", name: "Geometric Wall Art Panel", category: "home", subcategory_id: "decor", price: 35, description: "Abstract geometric wall panel. 12x12 inches.", emoji: "◆", rating: 4.7, review_count: 41, print_time: "5 hr", weight: "100g", trending: 0, featured: 1, materials: ["pla","silk"], tags: ["wall art","geometric","decor"] },
-            { id: "prod-056", name: "Moon Lamp", category: "home", subcategory_id: "decor", price: 40, description: "Realistic moon surface. USB-C rechargeable LED.", emoji: "🌙", rating: 4.9, review_count: 87, print_time: "6 hr", weight: "80g", trending: 0, featured: 1, materials: ["pla"], tags: ["lamp","moon","lighting"] },
-            { id: "prod-057", name: "Modern Vase", category: "home", subcategory_id: "decor", price: 25, description: "Twisted modern vase. Holds dried flowers or real with insert.", emoji: "🍷", rating: 4.6, review_count: 53, print_time: "3 hr", weight: "70g", trending: 0, featured: 0, materials: ["pla","silk","petg"], tags: ["vase","modern","decor"] },
-            { id: "prod-058", name: "Candle Holder Set (3pk)", category: "home", subcategory_id: "decor", price: 22, description: "Three geometric candle holders. Tea light compatible.", emoji: "🔥", rating: 4.5, review_count: 38, print_time: "2.5 hr", weight: "55g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["candle","holder","decor"] },
-            { id: "prod-059", name: "Floating Shelf Bracket (pair)", category: "home", subcategory_id: "decor", price: 16, description: "Hidden bracket for floating shelves. Supports 15 lbs.", emoji: "⬆️", rating: 4.7, review_count: 62, print_time: "2 hr", weight: "40g", trending: 0, featured: 0, materials: ["petg","abs","nylon"], tags: ["shelf","bracket","furniture"] },
-            { id: "prod-060", name: "Cookie Cutter Set (Animals)", category: "home", subcategory_id: "kitchen", price: 14, description: "6 animal cookie cutters: dog, cat, bunny, bear, bird, fish.", emoji: "⬟", rating: 4.8, review_count: 89, print_time: "1 hr", weight: "20g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["cookie","cutter","baking"] },
-            { id: "prod-061", name: "Napkin Ring Set (6pk)", category: "home", subcategory_id: "kitchen", price: 16, description: "Elegant twisted napkin rings. Set of 6.", emoji: "●●", rating: 4.5, review_count: 27, print_time: "1.5 hr", weight: "30g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["napkin","ring","dining"] },
-            { id: "prod-062", name: "Coaster Set (6pk)", category: "home", subcategory_id: "kitchen", price: 18, description: "Hexagonal coasters with cork backing. Set of 6.", emoji: "☕", rating: 4.7, review_count: 94, print_time: "2 hr", weight: "45g", trending: 1, featured: 0, materials: ["pla","silk","petg"], tags: ["coaster","hexagon","kitchen"] },
-            { id: "prod-063", name: "Utensil Holder", category: "home", subcategory_id: "kitchen", price: 20, description: "Countertop utensil holder with drainage. Fits standard utensils.", emoji: "🔪", rating: 4.6, review_count: 35, print_time: "3 hr", weight: "65g", trending: 0, featured: 0, materials: ["petg","pla"], tags: ["utensil","holder","kitchen"] },
-            { id: "prod-064", name: "Fridge Magnet Set (8pk)", category: "home", subcategory_id: "kitchen", price: 12, description: "Fun 3D magnets: fruits, emoji, animals. Set of 8.", emoji: "🧲", rating: 4.5, review_count: 76, print_time: "1 hr", weight: "15g", trending: 0, featured: 0, materials: ["pla"], tags: ["magnet","fridge","fun"] },
-            { id: "prod-065", name: "Bag Clip Set (6pk)", category: "home", subcategory_id: "kitchen", price: 10, description: "Heavy-duty bag clips. Seal chips, coffee, pet food.", emoji: "📎", rating: 4.4, review_count: 55, print_time: "45 min", weight: "18g", trending: 0, featured: 0, materials: ["petg","tpu"], tags: ["clip","bag","kitchen"] },
-            { id: "prod-012", name: "Custom Phone Case", category: "tech", subcategory_id: "phone-tablet", price: 25, description: "Custom-fit phone case for any model. Shock-absorbing TPU option.", emoji: "📱", rating: 4.6, review_count: 189, print_time: "3 hr", weight: "25g", trending: 0, featured: 1, materials: ["pla","tpu","petg"], tags: ["phone","case","protection"] },
-            { id: "prod-066", name: "Phone Stand (Adjustable)", category: "tech", subcategory_id: "phone-tablet", price: 18, description: "Adjustable angle phone stand. Works with any phone.", emoji: "📱", rating: 4.7, review_count: 124, print_time: "2 hr", weight: "30g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["phone","stand","desk"] },
-            { id: "prod-067", name: "Tablet Stand (Adjustable)", category: "tech", subcategory_id: "phone-tablet", price: 24, description: "Heavy-duty tablet stand. Fits iPad and similar.", emoji: "📱", rating: 4.6, review_count: 67, print_time: "3 hr", weight: "55g", trending: 0, featured: 0, materials: ["petg","abs"], tags: ["tablet","stand","ipad"] },
-            { id: "prod-068", name: "MagSafe Charging Dock", category: "tech", subcategory_id: "phone-tablet", price: 22, description: "Charging dock with Apple MagSafe puck holder.", emoji: "🔋", rating: 4.8, review_count: 85, print_time: "2.5 hr", weight: "40g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["magsafe","charger","iphone"] },
-            { id: "prod-069", name: "Cable Organizer Box", category: "tech", subcategory_id: "phone-tablet", price: 16, description: "Hide power strips & cables. Clean desk look.", emoji: "📦", rating: 4.5, review_count: 43, print_time: "3 hr", weight: "60g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["cable","organizer","desk"] },
-            { id: "prod-014", name: "Laptop Stand (Adjustable)", category: "tech", subcategory_id: "desktop", price: 32, description: "Ergonomic laptop stand with 3 height settings.", emoji: "💻", rating: 4.8, review_count: 71, print_time: "6 hr", weight: "200g", trending: 0, featured: 0, materials: ["petg","abs","nylon"], tags: ["laptop","stand","ergonomic"] },
-            { id: "prod-070", name: "Monitor Riser", category: "tech", subcategory_id: "desktop", price: 35, description: "Elevate your monitor to eye level. Storage underneath.", emoji: "🖥️", rating: 4.7, review_count: 48, print_time: "8 hr", weight: "250g", trending: 0, featured: 0, materials: ["petg","abs"], tags: ["monitor","riser","desk"] },
-            { id: "prod-071", name: "Pen Holder (Hex)", category: "tech", subcategory_id: "desktop", price: 14, description: "Hexagonal pen holder. Modular — combine multiple.", emoji: "✏️", rating: 4.5, review_count: 92, print_time: "1.5 hr", weight: "20g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["pen","holder","desk"] },
-            { id: "prod-010", name: "Headphone Stand", category: "tech", subcategory_id: "desktop", price: 30, description: "Elegant headphone stand with cable management.", emoji: "🎧", rating: 4.8, review_count: 67, print_time: "5 hr", weight: "150g", trending: 0, featured: 0, materials: ["pla","silk","petg"], tags: ["headphone","stand","desk"] },
-            { id: "prod-072", name: "Webcam Privacy Cover", category: "tech", subcategory_id: "desktop", price: 6, description: "Sliding privacy cover for laptop webcam. Ultra-thin.", emoji: "🔒", rating: 4.3, review_count: 156, print_time: "15 min", weight: "2g", trending: 0, featured: 0, materials: ["pla"], tags: ["webcam","privacy","laptop"] },
-            { id: "prod-015", name: "Earbud Case Holder", category: "tech", subcategory_id: "audio-wearables", price: 15, description: "Protective case with carabiner clip for AirPods.", emoji: "🎵", rating: 4.5, review_count: 108, print_time: "1 hr", weight: "15g", trending: 0, featured: 0, materials: ["pla","tpu"], tags: ["airpods","case","audio"] },
-            { id: "prod-013", name: "Apple Watch Charging Stand", category: "tech", subcategory_id: "audio-wearables", price: 20, description: "Elegant charging dock for Apple Watch.", emoji: "⌚", rating: 4.7, review_count: 92, print_time: "2 hr", weight: "35g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["watch","charger","apple"] },
-            { id: "prod-073", name: "Watch Band Organizer", category: "tech", subcategory_id: "audio-wearables", price: 16, description: "Display and organize 6 watch bands. Wall-mount or desk.", emoji: "⌚", rating: 4.4, review_count: 31, print_time: "2 hr", weight: "25g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["watch","organizer","display"] },
-            { id: "prod-074", name: "Speaker Wall Mount", category: "tech", subcategory_id: "audio-wearables", price: 14, description: "Wall mount bracket for small Bluetooth speakers.", emoji: "🔊", rating: 4.5, review_count: 45, print_time: "1.5 hr", weight: "20g", trending: 0, featured: 0, materials: ["petg","pla"], tags: ["speaker","mount","wall"] },
-            { id: "prod-075", name: "Cable Wrap Set (5pk)", category: "tech", subcategory_id: "audio-wearables", price: 10, description: "Reusable cable wraps. Keep earbuds tangle-free.", emoji: "🔄", rating: 4.3, review_count: 87, print_time: "30 min", weight: "10g", trending: 0, featured: 0, materials: ["tpu","pla"], tags: ["cable","wrap","organize"] },
-            { id: "prod-016", name: "Camera Lens Cap Holder", category: "tech", subcategory_id: "camera", price: 8, description: "Never lose your lens cap again. Universal fit.", emoji: "📷", rating: 4.4, review_count: 38, print_time: "40 min", weight: "8g", trending: 0, featured: 0, materials: ["pla","tpu","petg"], tags: ["camera","lens","holder"] },
-            { id: "prod-076", name: "GoPro Mount Adapter", category: "tech", subcategory_id: "camera", price: 12, description: "Universal GoPro mount adapter. Helmet, bike, tripod.", emoji: "🎥", rating: 4.6, review_count: 56, print_time: "1 hr", weight: "12g", trending: 0, featured: 0, materials: ["petg","abs"], tags: ["gopro","mount","action"] },
-            { id: "prod-077", name: "Ring Light Phone Mount", category: "tech", subcategory_id: "camera", price: 18, description: "Clip-on ring light with phone holder. USB-C.", emoji: "💡", rating: 4.7, review_count: 67, print_time: "2 hr", weight: "25g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["ring light","phone","photo"] },
-            { id: "prod-078", name: "Tripod Phone Adapter", category: "tech", subcategory_id: "camera", price: 10, description: "Universal phone to tripod adapter. Rotates 360°.", emoji: "📷", rating: 4.5, review_count: 89, print_time: "45 min", weight: "12g", trending: 0, featured: 0, materials: ["petg","pla"], tags: ["tripod","phone","adapter"] },
-            { id: "prod-079", name: "Memory Card Case", category: "tech", subcategory_id: "camera", price: 8, description: "Holds 6 SD + 6 micro SD cards. Water-resistant seal.", emoji: "💾", rating: 4.6, review_count: 34, print_time: "1 hr", weight: "10g", trending: 0, featured: 0, materials: ["petg","tpu"], tags: ["memory","card","storage"] },
-            { id: "prod-017", name: "Custom Jig / Fixture", category: "industrial", subcategory_id: "manufacturing", price: 200, description: "Production-grade jigs and fixtures. PA6-CF or Nylon.", emoji: "🔧", rating: 5.0, review_count: 24, print_time: "5 hr", weight: "100g", trending: 0, featured: 1, materials: ["pa6cf","nylon","abs","pc"], tags: ["jig","fixture","manufacturing"] },
-            { id: "prod-018", name: "Assembly Line Bracket", category: "industrial", subcategory_id: "manufacturing", price: 150, description: "Custom brackets for maquiladora assembly lines.", emoji: "⚙️", rating: 4.9, review_count: 18, print_time: "4 hr", weight: "75g", trending: 0, featured: 0, materials: ["pa6cf","nylon","petg","abs"], tags: ["bracket","assembly","industrial"] },
-            { id: "prod-020", name: "Conveyor Guide Rail", category: "industrial", subcategory_id: "manufacturing", price: 120, description: "Custom conveyor guides and clips. Food-safe PETG available.", emoji: "▭", rating: 4.8, review_count: 15, print_time: "6 hr", weight: "200g", trending: 0, featured: 0, materials: ["petg","nylon","abs"], tags: ["conveyor","guide","industrial"] },
-            { id: "prod-080", name: "Quality Control Gauge", category: "industrial", subcategory_id: "manufacturing", price: 85, description: "Go/no-go gauge for QC. Precision-machined accuracy.", emoji: "📏", rating: 4.9, review_count: 12, print_time: "3 hr", weight: "40g", trending: 0, featured: 0, materials: ["pa6cf","nylon","abs"], tags: ["gauge","qc","inspection"] },
-            { id: "prod-081", name: "Tool Holder (Wall Mount)", category: "industrial", subcategory_id: "manufacturing", price: 45, description: "Pegboard-compatible tool holders. Custom cutouts.", emoji: "🔨", rating: 4.7, review_count: 22, print_time: "3 hr", weight: "60g", trending: 0, featured: 0, materials: ["petg","abs","pla"], tags: ["tool","holder","workshop"] },
-            { id: "prod-021", name: "Rapid Prototype (per hour)", category: "industrial", subcategory_id: "prototyping", price: 85, description: "Turn your idea into reality. Engineering support included.", emoji: "🧪", rating: 4.9, review_count: 42, print_time: "varies", weight: "varies", trending: 0, featured: 0, materials: ["pla","petg","abs","tpu","pa6cf","nylon","pc","silk"], tags: ["prototype","rapid","engineering"] },
-            { id: "prod-022", name: "Architecture Scale Model", category: "industrial", subcategory_id: "prototyping", price: 500, description: "Detailed architectural models for real estate and presentations.", emoji: "🏛️", rating: 5.0, review_count: 8, print_time: "6+ hr", weight: "200g+", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["architecture","model","presentation"] },
-            { id: "prod-082", name: "Mechanical Demo Model", category: "industrial", subcategory_id: "prototyping", price: 120, description: "Working gear/cam/linkage models for education or sales.", emoji: "⚙️", rating: 4.8, review_count: 16, print_time: "5 hr", weight: "100g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["mechanical","demo","education"] },
-            { id: "prod-083", name: "Product Enclosure Prototype", category: "industrial", subcategory_id: "prototyping", price: 150, description: "Custom electronics enclosure. Fits PCBs and components.", emoji: "📦", rating: 4.7, review_count: 25, print_time: "4 hr", weight: "80g", trending: 0, featured: 0, materials: ["petg","abs","nylon"], tags: ["enclosure","electronics","prototype"] },
-            { id: "prod-019", name: "Emergency MRO Part", category: "industrial", subcategory_id: "prototyping", price: 400, description: "Rush replacement parts for production downtime. 24hr turnaround.", emoji: "⚠️", rating: 5.0, review_count: 11, print_time: "3.5 hr", weight: "varies", trending: 0, featured: 0, materials: ["pa6cf","nylon","abs","pc","petg"], tags: ["mro","emergency","replacement"] },
-            { id: "prod-084", name: "Cable Duct (Custom Length)", category: "industrial", subcategory_id: "assembly", price: 25, description: "Custom-length cable duct with snap-on lid.", emoji: "🔌", rating: 4.6, review_count: 19, print_time: "2 hr", weight: "30g", trending: 0, featured: 0, materials: ["petg","abs","pla"], tags: ["cable","duct","industrial"] },
-            { id: "prod-085", name: "Panel Mount Bracket", category: "industrial", subcategory_id: "assembly", price: 35, description: "DIN rail or panel mount brackets. Custom sizing.", emoji: "🔧", rating: 4.7, review_count: 14, print_time: "2.5 hr", weight: "25g", trending: 0, featured: 0, materials: ["pa6cf","nylon","petg","abs"], tags: ["panel","mount","bracket"] },
-            { id: "prod-086", name: "Hinge Set (Custom)", category: "industrial", subcategory_id: "assembly", price: 30, description: "Custom-tolerance hinges. Pin or living hinge.", emoji: "🚪", rating: 4.5, review_count: 10, print_time: "2 hr", weight: "20g", trending: 0, featured: 0, materials: ["nylon","tpu","petg"], tags: ["hinge","custom","hardware"] },
-            { id: "prod-087", name: "Spacer Kit (Mixed Sizes)", category: "industrial", subcategory_id: "assembly", price: 20, description: "Assorted spacers: M3-M8. 50 pieces per kit.", emoji: "⭕", rating: 4.4, review_count: 27, print_time: "1.5 hr", weight: "30g", trending: 0, featured: 0, materials: ["nylon","petg","abs"], tags: ["spacer","kit","hardware"] },
-            { id: "prod-088", name: "Bearing Housing (Custom)", category: "industrial", subcategory_id: "assembly", price: 55, description: "Custom bearing housings. Precision-fit tolerances.", emoji: "◉", rating: 4.8, review_count: 9, print_time: "3 hr", weight: "45g", trending: 0, featured: 0, materials: ["pa6cf","nylon","pc"], tags: ["bearing","housing","precision"] },
-            { id: "prod-024", name: "STL File Design Service", category: "custom", subcategory_id: "design-services", price: 100, description: "Professional CAD design from your sketch. 2 revision rounds.", emoji: "🎨", rating: 4.8, review_count: 35, print_time: "24-48 hr", weight: "N/A", trending: 0, featured: 0, materials: [], tags: ["design","stl","cad"] },
-            { id: "prod-089", name: "CAD Conversion Service", category: "custom", subcategory_id: "design-services", price: 75, description: "Convert 2D drawings or images to 3D-printable STL files.", emoji: "📐", rating: 4.7, review_count: 22, print_time: "24 hr", weight: "N/A", trending: 0, featured: 0, materials: [], tags: ["cad","conversion","2d-to-3d"] },
-            { id: "prod-090", name: "Model Optimization", category: "custom", subcategory_id: "design-services", price: 50, description: "Optimize existing STL for better print quality and speed.", emoji: "⚡", rating: 4.6, review_count: 18, print_time: "12 hr", weight: "N/A", trending: 0, featured: 0, materials: [], tags: ["optimize","stl","quality"] },
-            { id: "prod-091", name: "Small Part 3D Scan", category: "custom", subcategory_id: "scanning-services", price: 150, description: "Precision scan of parts up to 30cm. ±0.05mm accuracy.", emoji: "📐", rating: 4.8, review_count: 15, print_time: "2 hr", weight: "N/A", trending: 0, featured: 0, materials: [], tags: ["scan","small","precision"] },
-            { id: "prod-092", name: "Medium Object 3D Scan", category: "custom", subcategory_id: "scanning-services", price: 400, description: "Scan objects 30cm-1m. Full color texture capture.", emoji: "📐", rating: 4.9, review_count: 8, print_time: "4 hr", weight: "N/A", trending: 0, featured: 0, materials: [], tags: ["scan","medium","texture"] },
-            { id: "prod-093", name: "Large/Industrial 3D Scan", category: "custom", subcategory_id: "scanning-services", price: 800, description: "On-site scanning of large objects. Up to 3m.", emoji: "🏢", rating: 5.0, review_count: 5, print_time: "8 hr", weight: "N/A", trending: 0, featured: 0, materials: [], tags: ["scan","large","industrial"] },
-            { id: "prod-023", name: "3D Scan + Print Service", category: "custom", subcategory_id: "printing-services", price: 175, description: "Scan, clean mesh, print perfect replica. Reverse engineering available.", emoji: "📐", rating: 4.7, review_count: 19, print_time: "varies", weight: "varies", trending: 0, featured: 0, materials: ["pla","petg","abs","tpu","nylon"], tags: ["scan","print","replica"] },
-            { id: "prod-094", name: "Batch Printing Service", category: "custom", subcategory_id: "printing-services", price: 250, description: "Bulk production of identical parts. 50+ units. Volume discounts.", emoji: "🖨️", rating: 4.8, review_count: 12, print_time: "varies", weight: "varies", trending: 0, featured: 0, materials: ["pla","petg","abs","tpu","pa6cf","nylon"], tags: ["batch","bulk","production"] },
-            { id: "prod-095", name: "Post-Processing Service", category: "custom", subcategory_id: "printing-services", price: 45, description: "Sanding, painting, assembly of 3D printed parts.", emoji: "🎨", rating: 4.6, review_count: 28, print_time: "24-48 hr", weight: "N/A", trending: 0, featured: 0, materials: [], tags: ["finishing","painting","assembly"] },
-            { id: "prod-096", name: "Rush Order Service", category: "custom", subcategory_id: "printing-services", price: 50, description: "Priority processing. Same-day or next-day turnaround.", emoji: "⚡", rating: 4.9, review_count: 31, print_time: "varies", weight: "N/A", trending: 0, featured: 0, materials: [], tags: ["rush","priority","fast"] },
+            { id: "prod-006", name: "Planter Cube", category: "home", subcategory_id: "planters", price: 18, description: "Geometric cube planter. Drainage hole included. Perfect for succulents.", emoji: "🌵", rating: 4.8, review_count: 215, print_time: "1.5 hr", weight: "20g", trending: 1, featured: 1, materials: ["pla"], tags: ["planter","garden","home"] },
+            { id: "prod-007", name: "Wall Hanging Planter", category: "home", subcategory_id: "planters", price: 22, description: "Sleek wall-mounted planter system. Set of 3.", emoji: "🪴", rating: 4.7, review_count: 98, print_time: "2 hr", weight: "30g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["planter","wall","home"] },
+            { id: "prod-008", name: "Desk Organizer", category: "home", subcategory_id: "organization", price: 20, description: "Multi-compartment desktop organizer with removable sections.", emoji: "📦", rating: 4.6, review_count: 187, print_time: "2 hr", weight: "35g", trending: 0, featured: 0, materials: ["pla"], tags: ["organizer","desk","storage"] },
+            { id: "prod-009", name: "Cable Management Box", category: "home", subcategory_id: "organization", price: 16, description: "Hide messy cables. Comes with cable clips.", emoji: "🔌", rating: 4.5, review_count: 142, print_time: "1.5 hr", weight: "25g", trending: 0, featured: 0, materials: ["pla"], tags: ["cable","organization","desk"] },
+            { id: "prod-010", name: "Wall Art - Geometric", category: "home", subcategory_id: "decor", price: 35, description: "Modern geometric wall art. Three panels, 18\" x 6\" total.", emoji: "🎨", rating: 4.7, review_count: 76, print_time: "4 hr", weight: "80g", trending: 0, featured: 1, materials: ["pla","silk"], tags: ["wall","art","decor"] },
+            { id: "prod-011", name: "Mandala Wall Decor", category: "home", subcategory_id: "decor", price: 28, description: "Intricate mandala design. 12\" diameter. Perfect for bedroom.", emoji: "✨", rating: 4.8, review_count: 104, print_time: "3 hr", weight: "45g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["mandala","wall","decor"] },
+            { id: "prod-012", name: "Kitchen Spoon Holder", category: "home", subcategory_id: "kitchen", price: 12, description: "Stylish spoon and utensil holder. Easy to clean.", emoji: "🥄", rating: 4.4, review_count: 89, print_time: "1 hr", weight: "15g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["kitchen","holder","utensil"] },
+            { id: "prod-013", name: "Coaster Set (4pk)", category: "home", subcategory_id: "kitchen", price: 14, description: "Decorative coaster set. Water-resistant coating.", emoji: "☕", rating: 4.6, review_count: 112, print_time: "1.5 hr", weight: "20g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["coaster","kitchen","gift"] },
+            { id: "prod-014", name: "Phone Stand", category: "tech", subcategory_id: "phone-tablet", price: 12, description: "Universal phone stand. Holds any smartphone securely.", emoji: "📱", rating: 4.7, review_count: 289, print_time: "1 hr", weight: "18g", trending: 1, featured: 1, materials: ["pla","petg"], tags: ["phone","stand","tech"] },
+            { id: "prod-015", name: "iPad Holder", category: "tech", subcategory_id: "phone-tablet", price: 18, description: "Adjustable tablet holder. Perfect for recipes, videos.", emoji: "📲", rating: 4.6, review_count: 143, print_time: "1.5 hr", weight: "25g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["tablet","holder","tech"] },
+            { id: "prod-016", name: "Monitor Stand with Drawer", category: "tech", subcategory_id: "desktop", price: 35, description: "Elevate monitor + storage drawer. Saves desk space.", emoji: "🖥️", rating: 4.8, review_count: 167, print_time: "3 hr", weight: "120g", trending: 0, featured: 0, materials: ["pla"], tags: ["monitor","stand","desk"] },
+            { id: "prod-017", name: "Keyboard Wrist Rest", category: "tech", subcategory_id: "desktop", price: 15, description: "Ergonomic wrist rest for mechanical keyboards.", emoji: "⌨️", rating: 4.5, review_count: 98, print_time: "1.5 hr", weight: "22g", trending: 0, featured: 0, materials: ["tpu","pla"], tags: ["keyboard","ergonomic","desk"] },
+            { id: "prod-018", name: "Headphone Stand", category: "tech", subcategory_id: "audio-wearables", price: 14, description: "Sturdy headphone stand. Fits most over-ear headphones.", emoji: "🎧", rating: 4.6, review_count: 156, print_time: "1 hr", weight: "20g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["headphones","stand","audio"] },
+            { id: "prod-019", name: "Watch Display Stand", category: "tech", subcategory_id: "audio-wearables", price: 10, description: "Elegant watch holder. Multiple colors available.", emoji: "⌚", rating: 4.4, review_count: 73, print_time: "45 min", weight: "12g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["watch","display","stand"] },
+            { id: "prod-020", name: "Camera Tripod Mount", category: "tech", subcategory_id: "camera", price: 16, description: "Universal camera mount for tripods. Quick release.", emoji: "📷", rating: 4.7, review_count: 89, print_time: "1.5 hr", weight: "24g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["camera","tripod","mount"] },
+            { id: "prod-021", name: "Lens Cap Holder", category: "tech", subcategory_id: "camera", price: 8, description: "Prevents lost lens caps. Clip attachment.", emoji: "🔭", rating: 4.3, review_count: 42, print_time: "45 min", weight: "6g", trending: 0, featured: 0, materials: ["pla"], tags: ["camera","lens","holder"] },
+            { id: "prod-035", name: "Cable Organizer Clips", category: "tech", subcategory_id: "desktop", price: 6, description: "Self-adhesive cable clips. Pack of 10. Various colors.", emoji: "📎", rating: 4.5, review_count: 201, print_time: "30 min", weight: "8g", trending: 1, featured: 0, materials: ["pla","tpu"], tags: ["cable","clips","organization"] },
+            { id: "prod-036", name: "Desk Lamp Base", category: "tech", subcategory_id: "desktop", price: 24, description: "Minimalist lamp base. Fits standard light bulb sockets.", emoji: "💡", rating: 4.6, review_count: 67, print_time: "2 hr", weight: "40g", trending: 0, featured: 0, materials: ["pla"], tags: ["lamp","desk","lighting"] },
+            { id: "prod-037", name: "Drawer Dividers (Set)", category: "home", subcategory_id: "organization", price: 11, description: "Adjustable drawer organizers. Set of 4 dividers.", emoji: "🗄️", rating: 4.4, review_count: 55, print_time: "1.5 hr", weight: "18g", trending: 0, featured: 0, materials: ["pla"], tags: ["drawer","organizer","storage"] },
+            { id: "prod-038", name: "Bathroom Caddy", category: "home", subcategory_id: "organization", price: 19, description: "Shower caddy with drainage holes. Water-resistant.", emoji: "🚿", rating: 4.6, review_count: 88, print_time: "2 hr", weight: "32g", trending: 0, featured: 0, materials: ["petg","pla"], tags: ["bathroom","organizer","shower"] },
+            { id: "prod-039", name: "Wall Shelf Brackets (Pair)", category: "home", subcategory_id: "decor", price: 22, description: "Stylish shelf brackets. Supports up to 10 lbs per pair.", emoji: "🏠", rating: 4.7, review_count: 134, print_time: "2 hr", weight: "50g", trending: 0, featured: 0, materials: ["pla","nylon"], tags: ["shelf","bracket","wall"] },
+            { id: "prod-040", name: "Picture Frame (A4)", category: "home", subcategory_id: "decor", price: 16, description: "Minimalist frame for 8.5\" x 11\" prints. Matte finish.", emoji: "🖼️", rating: 4.5, review_count: 78, print_time: "1.5 hr", weight: "28g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["frame","art","decor"] },
+            { id: "prod-045", name: "Bench Top Vise", category: "industrial", subcategory_id: "manufacturing", price: 75, description: "Precision printing vise. 3\" capacity. Industrial grade.", emoji: "🔨", rating: 4.8, review_count: 23, print_time: "6 hr", weight: "250g", trending: 0, featured: 0, materials: ["nylon","carbon"], tags: ["vise","tool","manufacturing"] },
+            { id: "prod-046", name: "Hose Clamp Set (10pk)", category: "industrial", subcategory_id: "manufacturing", price: 18, description: "Durable hose clamps. Various sizes. MRO applications.", emoji: "🔩", rating: 4.6, review_count: 34, print_time: "2 hr", weight: "45g", trending: 0, featured: 0, materials: ["petg"], tags: ["clamp","industrial","mro"] },
+            { id: "prod-047", name: "PCB Holder", category: "industrial", subcategory_id: "manufacturing", price: 28, description: "Adjustable PCB holder for soldering and assembly.", emoji: "🔌", rating: 4.7, review_count: 56, print_time: "2.5 hr", weight: "60g", trending: 0, featured: 0, materials: ["pla","nylon"], tags: ["pcb","electronics","holder"] },
+            { id: "prod-048", name: "Prototype Housing", category: "industrial", subcategory_id: "prototyping", price: 45, description: "Generic prototype enclosure. Customizable, modular design.", emoji: "📦", rating: 4.5, review_count: 19, print_time: "5 hr", weight: "110g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["enclosure","prototype","housing"] },
+            { id: "prod-049", name: "Robotic Arm Base", category: "industrial", subcategory_id: "prototyping", price: 95, description: "Multi-axis robotic arm foundation. Full assembly kit.", emoji: "🤖", rating: 4.9, review_count: 12, print_time: "8 hr", weight: "280g", trending: 0, featured: 0, materials: ["nylon","carbon"], tags: ["robot","arm","prototype"] },
+            { id: "prod-050", name: "Bearing Block Set", category: "industrial", subcategory_id: "assembly", price: 32, description: "Precision bearing blocks for mechanical assemblies.", emoji: "⚙️", rating: 4.6, review_count: 29, print_time: "3 hr", weight: "85g", trending: 0, featured: 0, materials: ["nylon","pla"], tags: ["bearing","block","assembly"] },
+            { id: "prod-051", name: "Coupler Shaft", category: "industrial", subcategory_id: "assembly", price: 16, description: "Flexible shaft coupling. Standard sizing.", emoji: "🔄", rating: 4.4, review_count: 17, print_time: "1.5 hr", weight: "24g", trending: 0, featured: 0, materials: ["tpu","pla"], tags: ["coupler","shaft","assembly"] },
+            { id: "prod-052", name: "Design Consultation", category: "custom", subcategory_id: "design-services", price: 150, description: "1-hour professional design consultation. CAD ready.", emoji: "🎨", rating: 5.0, review_count: 45, print_time: "Varies", weight: "0g", trending: 0, featured: 0, materials: [], tags: ["design","custom","service"] },
+            { id: "prod-053", name: "3D File Conversion", category: "custom", subcategory_id: "design-services", price: 50, description: "Convert your sketch/image to print-ready 3D file.", emoji: "📐", rating: 4.8, review_count: 34, print_time: "N/A", weight: "0g", trending: 0, featured: 0, materials: [], tags: ["design","conversion","file"] },
+            { id: "prod-054", name: "Photogrammetry Scanning", category: "custom", subcategory_id: "scanning-services", price: 200, description: "Convert objects/people into detailed 3D models.", emoji: "📸", rating: 4.9, review_count: 28, print_time: "Varies", weight: "0g", trending: 0, featured: 0, materials: [], tags: ["scanning","photogrammetry","custom"] },
+            { id: "prod-055", name: "Lithophane from Photo", category: "custom", subcategory_id: "scanning-services", price: 35, description: "Turn your favorite photo into a stunning lithophane.", emoji: "🖼️", rating: 4.7, review_count: 89, print_time: "2 hr", weight: "45g", trending: 1, featured: 0, materials: ["pla"], tags: ["lithophane","photo","custom"] },
+            { id: "prod-056", name: "Small Object Scanning", category: "custom", subcategory_id: "scanning-services", price: 75, description: "Scan small objects up to 6 inches. High precision.", emoji: "🔬", rating: 4.6, review_count: 22, print_time: "1 hr", weight: "0g", trending: 0, featured: 0, materials: [], tags: ["scanning","precision","custom"] },
+            { id: "prod-057", name: "Rush Custom Print (24hr)", category: "custom", subcategory_id: "printing-services", price: 60, description: "Priority printing. Delivery within 24 hours (local only).", emoji: "⚡", rating: 4.5, review_count: 78, print_time: "24 hr", weight: "Varies", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["rush","custom","print"] },
+            { id: "prod-058", name: "Full Color Printing", category: "custom", subcategory_id: "printing-services", price: 85, description: "Multi-material color printing. Stunning photorealistic results.", emoji: "🌈", rating: 4.8, review_count: 56, print_time: "4 hr", weight: "Varies", trending: 0, featured: 0, materials: ["pla"], tags: ["color","custom","print"] },
+            { id: "prod-059", name: "Large Format Printing", category: "custom", subcategory_id: "printing-services", price: 200, description: "Print objects up to 400mm. Industrial-scale production.", emoji: "📏", rating: 4.7, review_count: 18, print_time: "Varies", weight: "Varies", trending: 0, featured: 0, materials: ["pla","petg","nylon"], tags: ["large","custom","print"] },
+            { id: "prod-060", name: "Bulk Order (100+ units)", category: "custom", subcategory_id: "printing-services", price: 500, description: "Volume pricing for 100+ units. Custom quote available.", emoji: "📦", rating: 4.9, review_count: 34, print_time: "Varies", weight: "Varies", trending: 1, featured: 0, materials: [], tags: ["bulk","custom","print"] },
+            { id: "prod-061", name: "Necklace Pendant", category: "consumer", subcategory_id: "figurines", price: 14, description: "Customizable pendant. Choose design and color.", emoji: "✨", rating: 4.6, review_count: 124, print_time: "1 hr", weight: "8g", trending: 1, featured: 0, materials: ["pla","silk"], tags: ["jewelry","pendant","gift"] },
+            { id: "prod-062", name: "Ring Box", category: "consumer", subcategory_id: "figurines", price: 16, description: "Elegant engagement ring box. Perfect proposal gift.", emoji: "💍", rating: 4.9, review_count: 87, print_time: "1.5 hr", weight: "18g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["jewelry","ring","proposal"] },
+            { id: "prod-063", name: "Phone Case (Custom)", category: "tech", subcategory_id: "phone-tablet", price: 22, description: "Custom phone case. Design your own pattern.", emoji: "📱", rating: 4.5, review_count: 201, print_time: "2 hr", weight: "28g", trending: 0, featured: 0, materials: ["tpu","pla"], tags: ["case","phone","custom"] },
+            { id: "prod-064", name: "Airpod Pro Case", category: "tech", subcategory_id: "audio-wearables", price: 12, description: "Protective case for AirPods Pro. Slim design.", emoji: "🎧", rating: 4.7, review_count: 145, print_time: "1 hr", weight: "6g", trending: 0, featured: 0, materials: ["tpu"], tags: ["case","airpods","audio"] },
+            { id: "prod-065", name: "Cable Organizer Bag", category: "home", subcategory_id: "organization", price: 18, description: "Fabric bag with 3D printed frame. Portable storage.", emoji: "🎒", rating: 4.4, review_count: 67, print_time: "1.5 hr", weight: "35g", trending: 0, featured: 0, materials: ["pla"], tags: ["organizer","bag","travel"] },
+            { id: "prod-066", name: "Plant Watering Spike", category: "home", subcategory_id: "planters", price: 8, description: "Automatic plant watering system. Adjustable flow.", emoji: "💧", rating: 4.5, review_count: 112, print_time: "45 min", weight: "12g", trending: 0, featured: 0, materials: ["petg","pla"], tags: ["planter","watering","garden"] },
+            { id: "prod-067", name: "Succulent Garden Tray", category: "home", subcategory_id: "planters", price: 24, description: "Multi-cell propagation tray. Perfect for succulents.", emoji: "🌱", rating: 4.6, review_count: 94, print_time: "2.5 hr", weight: "52g", trending: 0, featured: 0, materials: ["pla"], tags: ["planter","garden","tray"] },
+            { id: "prod-068", name: "Puzzle Organizer Box", category: "consumer", subcategory_id: "games", price: 26, description: "Sort & store puzzle pieces. Compartmented design.", emoji: "🧩", rating: 4.5, review_count: 48, print_time: "2 hr", weight: "44g", trending: 0, featured: 0, materials: ["pla"], tags: ["organizer","puzzle","games"] },
+            { id: "prod-069", name: "Board Game Insert", category: "consumer", subcategory_id: "games", price: 28, description: "Organizer insert for popular board games. Modular.", emoji: "🎮", rating: 4.7, review_count: 73, print_time: "2.5 hr", weight: "55g", trending: 0, featured: 0, materials: ["pla","nylon"], tags: ["board game","organizer","insert"] },
+            { id: "prod-070", name: "Dice Tray Deluxe", category: "consumer", subcategory_id: "games", price: 35, description: "Premium dice tray with dice tower. Magnetic closure.", emoji: "🎲", rating: 4.8, review_count: 156, print_time: "3 hr", weight: "75g", trending: 1, featured: 0, materials: ["pla","petg"], tags: ["dice","tray","games"] },
+            { id: "prod-071", name: "D&D Miniature Stand", category: "consumer", subcategory_id: "games", price: 12, description: "Display stand for tabletop RPG miniatures. Acrylic base.", emoji: "🎪", rating: 4.4, review_count: 39, print_time: "1.5 hr", weight: "22g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["miniature","stand","games"] },
+            { id: "prod-072", name: "Rubik's Cube Stand", category: "consumer", subcategory_id: "toys-fidgets", price: 10, description: "Display stand for speedcube. Protective, rotates freely.", emoji: "🔶", rating: 4.3, review_count: 61, print_time: "1 hr", weight: "14g", trending: 0, featured: 0, materials: ["pla"], tags: ["cube","stand","fidget"] },
+            { id: "prod-073", name: "Pop It Fidget Case", category: "consumer", subcategory_id: "toys-fidgets", price: 9, description: "Carrying case for Pop It toys. Protective padding.", emoji: "💥", rating: 4.2, review_count: 45, print_time: "1.5 hr", weight: "16g", trending: 0, featured: 0, materials: ["tpu","pla"], tags: ["popkit","case","fidget"] },
+            { id: "prod-074", name: "Desk Pet Statue", category: "home", subcategory_id: "decor", price: 14, description: "Mini desk creature. Cute companion for workspace.", emoji: "🦎", rating: 4.5, review_count: 82, print_time: "1.5 hr", weight: "20g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["desk","pet","decor"] },
+            { id: "prod-075", name: "Miniature Garden Scene", category: "home", subcategory_id: "decor", price: 32, description: "Enchanted fairy garden scene. Multi-piece setup.", emoji: "🧚", rating: 4.7, review_count: 71, print_time: "3.5 hr", weight: "65g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["garden","fairy","decor"] },
+            { id: "prod-076", name: "Lamp Shade Insert", category: "home", subcategory_id: "decor", price: 20, description: "Decorative lamp shade. Diffuses light beautifully.", emoji: "💡", rating: 4.6, review_count: 54, print_time: "2 hr", weight: "32g", trending: 0, featured: 0, materials: ["pla"], tags: ["lamp","shade","lighting"] },
+            { id: "prod-077", name: "Knife Block Insert", category: "home", subcategory_id: "kitchen", price: 15, description: "Modular knife storage. Fits standard knife blocks.", emoji: "🔪", rating: 4.5, review_count: 68, print_time: "1.5 hr", weight: "25g", trending: 0, featured: 0, materials: ["pla","nylon"], tags: ["kitchen","knife","storage"] },
+            { id: "prod-078", name: "Pasta Drying Rack", category: "home", subcategory_id: "kitchen", price: 18, description: "Space-saving pasta hanger. Holds 8 portions.", emoji: "🍝", rating: 4.4, review_count: 42, print_time: "2 hr", weight: "28g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["kitchen","pasta","rack"] },
+            { id: "prod-079", name: "Custom Logo Stamp", category: "consumer", subcategory_id: "figurines", price: 19, description: "Personalized stamp. Perfect for cookies or clay.", emoji: "🍪", rating: 4.6, review_count: 58, print_time: "1.5 hr", weight: "20g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["stamp","custom","baking"] },
+            { id: "prod-080", name: "Cookie Cutter Set", category: "home", subcategory_id: "kitchen", price: 12, description: "3D printed cookie cutters. Food-safe material.", emoji: "🍰", rating: 4.5, review_count: 95, print_time: "1.5 hr", weight: "18g", trending: 0, featured: 0, materials: ["pla"], tags: ["cutter","baking","kitchen"] },
+            { id: "prod-081", name: "Succulent Plant Necklace", category: "consumer", subcategory_id: "figurines", price: 13, description: "Adorable succulent plant pendant. Wearable art.", emoji: "🌿", rating: 4.7, review_count: 76, print_time: "1 hr", weight: "7g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["jewelry","plant","pendant"] },
+            { id: "prod-082", name: "UV Resin Mold", category: "industrial", subcategory_id: "prototyping", price: 42, description: "Custom mold for UV resin casting. Precision design.", emoji: "⚗️", rating: 4.7, review_count: 31, print_time: "3 hr", weight: "68g", trending: 0, featured: 0, materials: ["nylon"], tags: ["mold","resin","casting"] },
+            { id: "prod-083", name: "Bracket Assembly Kit", category: "industrial", subcategory_id: "assembly", price: 29, description: "Wall bracket assembly. Pre-drilled, hardware included.", emoji: "⚙️", rating: 4.5, review_count: 24, print_time: "2 hr", weight: "54g", trending: 0, featured: 0, materials: ["nylon","pla"], tags: ["bracket","assembly","hardware"] },
+            { id: "prod-084", name: "Gasket & Seal Set", category: "industrial", subcategory_id: "manufacturing", price: 22, description: "Various gaskets and seals. Waterproof TPU material.", emoji: "🔧", rating: 4.6, review_count: 19, print_time: "1.5 hr", weight: "35g", trending: 0, featured: 0, materials: ["tpu"], tags: ["gasket","seal","mro"] },
+            { id: "prod-085", name: "Logo Embosser", category: "consumer", subcategory_id: "figurines", price: 17, description: "Custom embosser tool for leather, paper, and clay.", emoji: "🏷️", rating: 4.5, review_count: 52, print_time: "1.5 hr", weight: "22g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["logo","embosser","custom"] },
+            { id: "prod-086", name: "Mini Terrarium Kit", category: "home", subcategory_id: "planters", price: 21, description: "Complete terrarium. Includes container and plants.", emoji: "🌍", rating: 4.6, review_count: 88, print_time: "2 hr", weight: "40g", trending: 0, featured: 0, materials: ["pla"], tags: ["terrarium","garden","kit"] },
+            { id: "prod-087", name: "3D Printer Nozzle Holder", category: "tech", subcategory_id: "desktop", price: 11, description: "Organizer for printer nozzles and tools.", emoji: "🔧", rating: 4.4, review_count: 67, print_time: "1 hr", weight: "15g", trending: 0, featured: 0, materials: ["pla"], tags: ["3dprinter","tool","holder"] },
+            { id: "prod-088", name: "Filament Spool Holder", category: "tech", subcategory_id: "desktop", price: 16, description: "Wall-mounted filament storage. Holds 4 spools.", emoji: "📦", rating: 4.5, review_count: 103, print_time: "1.5 hr", weight: "28g", trending: 0, featured: 0, materials: ["nylon","pla"], tags: ["filament","holder","3dprinter"] },
+            { id: "prod-089", name: "Bonsai Tree Figurine", category: "consumer", subcategory_id: "figurines", price: 38, description: "Miniature bonsai tree sculpture. Intricate detail.", emoji: "🌳", rating: 4.8, review_count: 64, print_time: "4 hr", weight: "72g", trending: 0, featured: 0, materials: ["pla","silk"], tags: ["bonsai","tree","art"] },
+            { id: "prod-090", name: "Mini Tool Set", category: "home", subcategory_id: "organization", price: 13, description: "Compact tool organizer with 6 hanging tools.", emoji: "🔨", rating: 4.3, review_count: 41, print_time: "1.5 hr", weight: "25g", trending: 0, featured: 0, materials: ["pla"], tags: ["tools","organizer","storage"] },
+            { id: "prod-091", name: "Magnetic Wire Manager", category: "tech", subcategory_id: "desktop", price: 14, description: "Magnetic cable organizer clips. Set of 8.", emoji: "🧲", rating: 4.6, review_count: 89, print_time: "1 hr", weight: "16g", trending: 0, featured: 0, materials: ["pla"], tags: ["cable","magnetic","organizer"] },
+            { id: "prod-092", name: "Desktop Garden", category: "home", subcategory_id: "planters", price: 27, description: "3-pot hydroponic garden system. Grow herbs indoors.", emoji: "🌿", rating: 4.7, review_count: 74, print_time: "2.5 hr", weight: "58g", trending: 0, featured: 0, materials: ["pla","petg"], tags: ["garden","hydroponic","herb"] },
+            { id: "prod-093", name: "Geometric Bookends", category: "home", subcategory_id: "decor", price: 25, description: "Minimalist bookends. Support up to 5 lbs.", emoji: "📚", rating: 4.5, review_count: 56, print_time: "2 hr", weight: "52g", trending: 0, featured: 0, materials: ["pla","nylon"], tags: ["bookend","decor","geometric"] },
+            { id: "prod-094", name: "Desk Zen Garden", category: "home", subcategory_id: "decor", price: 19, description: "Mini zen garden with tools. Stress relief.", emoji: "🧘", rating: 4.6, review_count: 98, print_time: "2 hr", weight: "35g", trending: 0, featured: 0, materials: ["pla"], tags: ["zen","garden","desk"] },
+            { id: "prod-095", name: "Custom Portrait Bust", category: "custom", subcategory_id: "design-services", price: 250, description: "Full-color 3D printed portrait bust. Lifelike detail.", emoji: "🎭", rating: 4.9, review_count: 18, print_time: "Varies", weight: "350g", trending: 0, featured: 0, materials: ["pla"], tags: ["portrait","bust","custom"] },
+            { id: "prod-096", name: "Architectural Model Kit", category: "custom", subcategory_id: "prototyping", price: 120, description: "Build your dream home. Modular architecture model.", emoji: "🏗️", rating: 4.8, review_count: 14, print_time: "10 hr", weight: "280g", trending: 1, featured: 0, materials: ["pla"], tags: ["architecture","model","prototype"] },
         ];
 
         const CATEGORIES = [
-            { id: "consumer", name: "Consumer & Gifts", description: "Toys, figurines, keychains, collectibles" },
-            { id: "home", name: "Home & Living", description: "Planters, organizers, décor, kitchen" },
-            { id: "tech", name: "Tech & Gadgets", description: "Phone cases, stands, desktop accessories" },
-            { id: "industrial", name: "Industrial & B2B", description: "Jigs, fixtures, MRO parts, prototypes" },
-            { id: "custom", name: "Custom & Services", description: "Design, scanning, custom printing" },
+            { id: "consumer", name: "Consumer & Gifts", emoji: "🛍️", description: "Toys, figurines, keychains, collectibles" },
+            { id: "home", name: "Home & Living", emoji: "🏠", description: "Planters, organizers, décor, kitchen" },
+            { id: "tech", name: "Tech & Gadgets", emoji: "💻", description: "Phone cases, stands, desktop accessories" },
+            { id: "industrial", name: "Industrial & B2B", emoji: "🏭", description: "Jigs, fixtures, MRO parts, prototypes" },
+            { id: "custom", name: "Custom & Services", emoji: "✨", description: "Design, scanning, custom printing" },
         ];
 
         const SUBCATEGORIES = [
@@ -1380,9 +1951,9 @@
             { id: "printing-services", category_id: "custom", name: "Custom Printing" },
         ];
 
-        // ============================================================================
-        // INITIALIZATION
-        // ============================================================================
+        function t(key) {
+            return translations[appState.currentLang][key] || key;
+        }
 
         function init() {
             appState.products = PRODUCTS;
@@ -1390,36 +1961,267 @@
             appState.subcategories = SUBCATEGORIES;
             loadFromLocalStorage();
             renderCategoryPills();
-            renderSubcategoryFilter();
+            renderFeaturedCarousel();
             renderProducts();
             setupEventListeners();
             updateCartBadge();
+            setupMobileUI();
+            setupNavbarScroll();
         }
 
         function loadFromLocalStorage() {
             const saved = localStorage.getItem('hacemoState');
             if (saved) {
-                const parsed = JSON.parse(saved);
-                appState.cart = parsed.cart || [];
-                appState.favorites = parsed.favorites || [];
-                appState.user = parsed.user || null;
-                appState.currentLang = parsed.currentLang || 'en';
-                appState.currentCurrency = parsed.currentCurrency || 'usd';
+                const data = JSON.parse(saved);
+                appState.cart = data.cart || [];
+                appState.favorites = data.favorites || [];
+                appState.currentUser = data.currentUser || null;
+                appState.users = data.users || {};
+                appState.orders = data.orders || [];
             }
         }
 
         function saveToLocalStorage() {
-            localStorage.setItem('hacemoState', JSON.stringify({
+            const data = {
                 cart: appState.cart,
                 favorites: appState.favorites,
-                user: appState.user,
-                currentLang: appState.currentLang,
-                currentCurrency: appState.currentCurrency,
-            }));
+                currentUser: appState.currentUser,
+                users: appState.users,
+                orders: appState.orders,
+            };
+            localStorage.setItem('hacemoState', JSON.stringify(data));
         }
 
-        function t(key) {
-            return translations[appState.currentLang][key] || key;
+        function renderCategoryPills() {
+            const container = document.getElementById('categoryPills');
+            container.innerHTML = '';
+            const categories = [{ id: 'all', name: 'All Products', emoji: '✨' }, ...appState.categories];
+            categories.forEach(cat => {
+                const pill = document.createElement('button');
+                pill.className = 'pill';
+                pill.innerHTML = `<span class="pill-icon">${cat.emoji || ''}</span><span>${cat.name}</span>`;
+                pill.onclick = () => filterByCategory(cat.id === 'all' ? null : cat.id);
+                container.appendChild(pill);
+            });
+        }
+
+        function renderFeaturedCarousel() {
+            const container = document.getElementById('carousel');
+            container.innerHTML = '';
+            const featured = appState.products.filter(p => p.featured || p.trending);
+            featured.forEach(product => {
+                const card = createProductCard(product);
+                card.className = 'carousel-card product-card';
+                container.appendChild(card);
+            });
+        }
+
+        function renderProducts(products = null) {
+            const container = document.getElementById('productsGrid');
+            container.innerHTML = '';
+            const toRender = products || appState.products;
+            const count = toRender.length;
+            document.getElementById('resultCount').textContent = `Showing ${count} product${count !== 1 ? 's' : ''}`;
+            toRender.forEach(product => {
+                container.appendChild(createProductCard(product));
+            });
+        }
+
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            const stars = '★'.repeat(Math.floor(product.rating)) + '☆'.repeat(5 - Math.floor(product.rating));
+            const isFavorited = appState.favorites.includes(product.id);
+            card.innerHTML = `
+                <div class="product-emoji">
+                    ${product.emoji}
+                    <button class="product-heart ${isFavorited ? 'favorited' : ''}" onclick="toggleFavorite('${product.id}', event)">
+                        ${isFavorited ? '❤️' : '🤍'}
+                    </button>
+                </div>
+                <div class="product-info">
+                    <div class="product-tags">
+                        ${product.tags && product.tags[0] ? `<span class="product-tag">${product.tags[0]}</span>` : ''}
+                        ${product.featured ? '<span class="product-tag popular">Featured</span>' : ''}
+                        ${product.trending ? '<span class="product-tag limited">Trending</span>' : ''}
+                    </div>
+                    <div class="product-category">${product.category}</div>
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-desc">${product.description}</div>
+                    <div class="product-rating">
+                        <span class="product-rating-stars">${stars}</span>
+                        <span>(${product.review_count})</span>
+                    </div>
+                </div>
+                <div class="product-footer">
+                    <div class="product-price">$${product.price.toFixed(2)}</div>
+                    <button class="product-add-cart" onclick="addToCart('${product.id}')">Add</button>
+                </div>
+            `;
+            card.onclick = (e) => {
+                if (e.target.className.includes('product-heart') || e.target.className.includes('product-add-cart')) return;
+                openModal(product);
+            };
+            return card;
+        }
+
+        function filterByCategory(category) {
+            const pills = document.querySelectorAll('.pill');
+            pills.forEach(p => p.classList.remove('active'));
+            event.target.closest('.pill').classList.add('active');
+
+            if (category === null) {
+                renderProducts();
+            } else {
+                const filtered = appState.products.filter(p => p.category === category);
+                renderProducts(filtered);
+            }
+        }
+
+        function openModal(product) {
+            const modal = document.getElementById('productModal');
+            document.getElementById('modalEmoji').textContent = product.emoji;
+            document.getElementById('modalName').textContent = product.name;
+            document.getElementById('modalDesc').textContent = product.description;
+            document.getElementById('modalPrice').textContent = `$${product.price.toFixed(2)}`;
+            document.getElementById('modalTime').textContent = product.print_time;
+            document.getElementById('modalWeight').textContent = product.weight;
+            document.getElementById('modalRating').textContent = `${product.rating} (${product.review_count} reviews)`;
+            const materialsDiv = document.getElementById('modalMaterials');
+            materialsDiv.innerHTML = product.materials.map(m => `<div class="material-chip">${m.toUpperCase()}</div>`).join('');
+            document.getElementById('modalAddCart').onclick = () => {
+                addToCart(product.id);
+                closeModal();
+            };
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').classList.remove('active');
+        }
+
+        function toggleFavorite(productId, e) {
+            e.stopPropagation();
+            const index = appState.favorites.indexOf(productId);
+            if (index > -1) {
+                appState.favorites.splice(index, 1);
+            } else {
+                appState.favorites.push(productId);
+            }
+            saveToLocalStorage();
+            renderProducts();
+            renderFeaturedCarousel();
+        }
+
+        function addToCart(productId) {
+            const product = appState.products.find(p => p.id === productId);
+            const existingItem = appState.cart.find(i => i.id === productId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                appState.cart.push({ ...product, quantity: 1 });
+            }
+            saveToLocalStorage();
+            updateCartBadge();
+            showToast('Added to cart!');
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cartBadge');
+            const mobileBadge = document.getElementById('mobileCartBadge');
+            const count = appState.cart.reduce((sum, item) => sum + item.quantity, 0);
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'flex';
+                mobileBadge.textContent = count;
+                mobileBadge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+                mobileBadge.style.display = 'none';
+            }
+        }
+
+        function renderCart() {
+            const cartItems = document.getElementById('cartItems');
+            if (appState.cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="cart-empty">
+                        <div class="cart-empty-emoji">🛒</div>
+                        <h3>Cart is empty</h3>
+                        <p>Start adding products to get started!</p>
+                    </div>
+                `;
+                document.getElementById('cartTotal').textContent = '$0.00';
+                return;
+            }
+            cartItems.innerHTML = appState.cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-emoji">${item.emoji}</div>
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+                        <div class="cart-item-qty">
+                            <button class="qty-btn" onclick="updateQty('${item.id}', -1)">−</button>
+                            <span>${item.quantity}</span>
+                            <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
+                            <button class="qty-btn" style="margin-left: auto;" onclick="removeFromCart('${item.id}')">✕</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            const total = appState.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+        }
+
+        function updateQty(productId, delta) {
+            const item = appState.cart.find(i => i.id === productId);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    saveToLocalStorage();
+                    renderCart();
+                    updateCartBadge();
+                }
+            }
+        }
+
+        function removeFromCart(productId) {
+            appState.cart = appState.cart.filter(i => i.id !== productId);
+            saveToLocalStorage();
+            renderCart();
+            updateCartBadge();
+        }
+
+        function openCart() {
+            renderCart();
+            document.getElementById('cartDrawer').classList.add('active');
+            document.getElementById('cartOverlay').classList.add('active');
+        }
+
+        function closeCart() {
+            document.getElementById('cartDrawer').classList.remove('active');
+            document.getElementById('cartOverlay').classList.remove('active');
+        }
+
+        function checkout() {
+            if (appState.cart.length === 0) {
+                showToast('Cart is empty!');
+                return;
+            }
+            const total = appState.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            appState.orders.push({
+                id: Date.now(),
+                items: [...appState.cart],
+                total: total,
+                date: new Date().toLocaleDateString(),
+            });
+            appState.cart = [];
+            saveToLocalStorage();
+            updateCartBadge();
+            closeCart();
+            showToast(`Order placed! Total: $${total.toFixed(2)}`);
         }
 
         function showToast(message) {
@@ -1430,638 +2232,88 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
-        // ============================================================================
-        // CATEGORY & FILTER RENDERING
-        // ============================================================================
-
-        function renderCategoryPills() {
-            const container = document.getElementById('categoryPills');
-            container.innerHTML = '';
-            CATEGORIES.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.className = 'pill' + (appState.selectedCategory === cat.id ? ' active' : '');
-                btn.textContent = cat.name;
-                btn.onclick = () => {
-                    appState.selectedCategory = appState.selectedCategory === cat.id ? null : cat.id;
-                    renderCategoryPills();
-                    renderProducts();
-                };
-                container.appendChild(btn);
-            });
-        }
-
-        function renderSubcategoryFilter() {
-            const select = document.getElementById('subcategoryFilter');
-            select.innerHTML = '<option value="">All Subcategories</option>';
-            SUBCATEGORIES.forEach(sub => {
-                if (!appState.selectedCategory || sub.category_id === appState.selectedCategory) {
-                    const opt = document.createElement('option');
-                    opt.value = sub.id;
-                    opt.textContent = sub.name;
-                    select.appendChild(opt);
-                }
-            });
-        }
-
-        function renderHeroCategories() {
-            const container = document.getElementById('heroCategories');
-            container.innerHTML = '';
-            CATEGORIES.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.className = 'category-btn';
-                btn.textContent = cat.name;
-                btn.onclick = () => {
-                    appState.selectedCategory = cat.id;
-                    renderCategoryPills();
-                    renderSubcategoryFilter();
-                    renderProducts();
-                };
-                container.appendChild(btn);
-            });
-        }
-
-        // ============================================================================
-        // PRODUCT RENDERING
-        // ============================================================================
-
-        function getFilteredProducts() {
-            let filtered = appState.products;
-
-            // Category filter
-            if (appState.selectedCategory) {
-                filtered = filtered.filter(p => p.category === appState.selectedCategory);
-            }
-
-            // Subcategory filter
-            const subFilter = document.getElementById('subcategoryFilter');
-            if (subFilter && subFilter.value) {
-                filtered = filtered.filter(p => p.subcategory_id === subFilter.value);
-            }
-
-            // Search filter
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput && searchInput.value) {
-                const query = searchInput.value.toLowerCase();
-                filtered = filtered.filter(p =>
-                    p.name.toLowerCase().includes(query) ||
-                    p.description.toLowerCase().includes(query)
-                );
-            }
-
-            // Sort
-            const sortBy = document.getElementById('sortBy');
-            const sortValue = sortBy ? sortBy.value : 'newest';
-            filtered.sort((a, b) => {
-                switch(sortValue) {
-                    case 'name': return a.name.localeCompare(b.name);
-                    case 'price-low': return a.price - b.price;
-                    case 'price-high': return b.price - a.price;
-                    case 'rating': return b.rating - a.rating;
-                    default: return b.id.localeCompare(a.id);
-                }
-            });
-
-            return filtered;
-        }
-
-        function renderProducts() {
-            const container = document.getElementById('productsGrid');
-            if (!container) return;
-            container.innerHTML = '';
-
-            const products = getFilteredProducts();
-            products.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                const isFav = appState.favorites.includes(product.id);
-                const tags = product.tags || [];
-                const tagHTML = tags.map(tag => {
-                    let tagClass = 'product-tag';
-                    if (tag === 'popular') tagClass += ' popular';
-                    if (tag === 'limited') tagClass += ' limited';
-                    return `<span class="product-tag">${tag}</span>`;
-                }).join('');
-
-                const price = appState.currentCurrency === 'mxn'
-                    ? `$${(product.price * EXCHANGE_RATE).toFixed(2)}`
-                    : `$${product.price.toFixed(2)}`;
-
-                card.innerHTML = `
-                    <div class="product-emoji">
-                        ${product.emoji}
-                        <button class="product-heart ${isFav ? 'favorited' : ''}" data-id="${product.id}">♥</button>
-                    </div>
-                    <div class="product-tags">${tagHTML}</div>
-                    <div class="product-info">
-                        <div class="product-category">${product.subcategory_id.replace('-', ' ').toUpperCase()}</div>
-                        <div class="product-name">${product.name}</div>
-                        <div class="product-desc">${product.description.substring(0, 50)}...</div>
-                        <div class="product-rating">⭐ ${product.rating} (${product.review_count})</div>
-                        <div class="product-footer">
-                            <div class="product-price">${price}</div>
-                            <button class="product-add-cart" data-id="${product.id}">Add to Cart</button>
-                        </div>
-                    </div>
-                `;
-
-                card.querySelector('.product-heart').onclick = (e) => {
-                    e.stopPropagation();
-                    if (!appState.user) {
-                        showToast(t('loginRequired'));
-                        return;
-                    }
-                    toggleFavorite(product.id);
-                };
-
-                card.querySelector('.product-add-cart').onclick = (e) => {
-                    e.stopPropagation();
-                    addToCart(product);
-                };
-
-                card.onclick = () => openProductModal(product);
-                container.appendChild(card);
-            });
-        }
-
-        function toggleFavorite(productId) {
-            const idx = appState.favorites.indexOf(productId);
-            if (idx > -1) {
-                appState.favorites.splice(idx, 1);
-            } else {
-                appState.favorites.push(productId);
-            }
-            saveToLocalStorage();
-            renderProducts();
-            showToast(idx > -1 ? 'Removed from favorites' : 'Added to favorites');
-        }
-
-        function addToCart(product) {
-            const existingItem = appState.cart.find(item => item.id === product.id);
-            if (existingItem) {
-                existingItem.quantity++;
-            } else {
-                appState.cart.push({...product, quantity: 1});
-            }
-            saveToLocalStorage();
-            updateCartBadge();
-            updateCartDrawer();
-            showToast(t('addedToCart'));
-        }
-
-        // ============================================================================
-        // PRODUCT MODAL
-        // ============================================================================
-
-        function openProductModal(product) {
-            const modal = document.getElementById('productModal');
-            document.getElementById('modalProductName').textContent = product.name;
-            document.getElementById('modalEmoji').textContent = product.emoji;
-            document.getElementById('modalDescription').textContent = product.description;
-
-            const specsHTML = `
-                <div class="modal-specs-row">
-                    <span class="modal-specs-label">Rating:</span>
-                    <span class="modal-specs-value">⭐ ${product.rating} (${product.review_count} reviews)</span>
-                </div>
-                <div class="modal-specs-row">
-                    <span class="modal-specs-label">Print Time:</span>
-                    <span class="modal-specs-value">${product.print_time}</span>
-                </div>
-                <div class="modal-specs-row">
-                    <span class="modal-specs-label">Weight:</span>
-                    <span class="modal-specs-value">${product.weight}</span>
-                </div>
-            `;
-            document.getElementById('modalSpecs').innerHTML = specsHTML;
-
-            const materialsHTML = product.materials.length > 0
-                ? `<h4>Available Materials</h4><div class="modal-material-chips">${product.materials.map(m => `<span class="material-chip">${m.toUpperCase()}</span>`).join('')}</div>`
-                : '';
-            document.getElementById('modalMaterials').innerHTML = materialsHTML;
-
-            const addBtn = document.getElementById('modalAddCart');
-            addBtn.onclick = () => {
-                addToCart(product);
-                modal.classList.remove('active');
-            };
-
-            modal.classList.add('active');
-        }
-
-        // ============================================================================
-        // CART
-        // ============================================================================
-
-        function updateCartBadge() {
-            const badge = document.getElementById('cartBadge');
-            const count = appState.cart.reduce((sum, item) => sum + item.quantity, 0);
-            if (count > 0) {
-                badge.textContent = count;
-                badge.style.display = 'flex';
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-
-        function updateCartDrawer() {
-            const container = document.getElementById('cartItems');
-            container.innerHTML = '';
-
-            if (appState.cart.length === 0) {
-                container.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
-            } else {
-                appState.cart.forEach(item => {
-                    const price = appState.currentCurrency === 'mxn'
-                        ? `$${(item.price * EXCHANGE_RATE).toFixed(2)}`
-                        : `$${item.price.toFixed(2)}`;
-
-                    const itemEl = document.createElement('div');
-                    itemEl.className = 'cart-item';
-                    itemEl.innerHTML = `
-                        <div class="cart-item-emoji">${item.emoji}</div>
-                        <div class="cart-item-info">
-                            <div class="cart-item-name">${item.name}</div>
-                            <div class="cart-item-price">${price}</div>
-                            <div class="cart-item-controls">
-                                <button class="qty-btn" data-id="${item.id}" data-action="dec">−</button>
-                                <div class="qty-display">${item.quantity}</div>
-                                <button class="qty-btn" data-id="${item.id}" data-action="inc">+</button>
-                                <button class="cart-remove" data-id="${item.id}">Remove</button>
-                            </div>
-                        </div>
-                    `;
-
-                    itemEl.querySelector('[data-action="inc"]').onclick = () => {
-                        item.quantity++;
-                        saveToLocalStorage();
-                        updateCartBadge();
-                        updateCartDrawer();
-                    };
-
-                    itemEl.querySelector('[data-action="dec"]').onclick = () => {
-                        if (item.quantity > 1) {
-                            item.quantity--;
-                        } else {
-                            appState.cart = appState.cart.filter(i => i.id !== item.id);
-                        }
-                        saveToLocalStorage();
-                        updateCartBadge();
-                        updateCartDrawer();
-                    };
-
-                    itemEl.querySelector('.cart-remove').onclick = () => {
-                        appState.cart = appState.cart.filter(i => i.id !== item.id);
-                        saveToLocalStorage();
-                        updateCartBadge();
-                        updateCartDrawer();
-                    };
-
-                    container.appendChild(itemEl);
-                });
-            }
-
-            const total = appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const totalPrice = appState.currentCurrency === 'mxn'
-                ? `$${(total * EXCHANGE_RATE).toFixed(2)}`
-                : `$${total.toFixed(2)}`;
-            document.getElementById('cartTotal').textContent = totalPrice;
-        }
-
-        // ============================================================================
-        // PAGES & NAVIGATION
-        // ============================================================================
-
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            appState.currentPage = pageId;
-
-            if (pageId === 'favoritesPage') renderFavoritesPage();
-            if (pageId === 'accountPage') renderAccountPage();
-        }
-
-        function renderFavoritesPage() {
-            if (!appState.user) {
-                document.getElementById('favoritesPage').innerHTML = `
-                    <div class="page-header"><h1>${t('favTitle')}</h1></div>
-                    <div class="page-content"><p>${t('loginRequired')}</p></div>
-                `;
-                return;
-            }
-
-            const grid = document.getElementById('favoritesGrid');
-            grid.innerHTML = '';
-            const favProducts = appState.products.filter(p => appState.favorites.includes(p.id));
-
-            if (favProducts.length === 0) {
-                grid.parentElement.innerHTML = `<p>${t('noFavorites')}</p>`;
-                return;
-            }
-
-            favProducts.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                const price = appState.currentCurrency === 'mxn'
-                    ? `$${(product.price * EXCHANGE_RATE).toFixed(2)}`
-                    : `$${product.price.toFixed(2)}`;
-
-                card.innerHTML = `
-                    <div class="product-emoji">
-                        ${product.emoji}
-                        <button class="product-heart favorited" data-id="${product.id}">♥</button>
-                    </div>
-                    <div class="product-info">
-                        <div class="product-name">${product.name}</div>
-                        <div class="product-footer">
-                            <div class="product-price">${price}</div>
-                            <button class="product-add-cart" data-id="${product.id}">Add to Cart</button>
-                        </div>
-                    </div>
-                `;
-
-                card.querySelector('.product-heart').onclick = (e) => {
-                    e.stopPropagation();
-                    toggleFavorite(product.id);
-                    renderFavoritesPage();
-                };
-
-                card.querySelector('.product-add-cart').onclick = (e) => {
-                    e.stopPropagation();
-                    addToCart(product);
-                };
-
-                grid.appendChild(card);
-            });
-        }
-
-        function renderAccountPage() {
-            const content = document.getElementById('accountContent');
-
-            if (!appState.user) {
-                content.innerHTML = `<p>${t('loginRequired')}</p>`;
-                return;
-            }
-
-            content.innerHTML = `
-                <div style="max-width: 600px;">
-                    <h2>${t('myProfile')}</h2>
-                    <div class="form-group">
-                        <label>${t('name')}:</label>
-                        <input type="text" id="profileName" value="${appState.user.name || ''}" />
-                    </div>
-                    <div class="form-group">
-                        <label>${t('email')}:</label>
-                        <input type="email" id="profileEmail" value="${appState.user.email || ''}" />
-                    </div>
-                    <div class="form-group">
-                        <label>${t('phone')}:</label>
-                        <input type="tel" id="profilePhone" value="${appState.user.phone || ''}" />
-                    </div>
-                    <button class="form-submit" id="saveProfileBtn">${t('save')}</button>
-                    <button class="form-submit" id="logoutBtn" style="background: #999; margin-top: 10px;">${t('logout')}</button>
-
-                    <h2 style="margin-top: 40px;">${t('orderHistory')}</h2>
-                    <div id="ordersContainer"></div>
-                </div>
-            `;
-
-            document.getElementById('saveProfileBtn').onclick = () => {
-                appState.user.name = document.getElementById('profileName').value;
-                appState.user.email = document.getElementById('profileEmail').value;
-                appState.user.phone = document.getElementById('profilePhone').value;
-                saveToLocalStorage();
-                showToast('Profile updated');
-            };
-
-            document.getElementById('logoutBtn').onclick = () => {
-                appState.user = null;
-                appState.favorites = [];
-                appState.cart = [];
-                saveToLocalStorage();
-                showPage('homePage');
-            };
-
-            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-            const ordersContainer = document.getElementById('ordersContainer');
-            if (orders.length === 0) {
-                ordersContainer.innerHTML = `<p>${t('noOrders')}</p>`;
-            } else {
-                ordersContainer.innerHTML = orders.map(order => `
-                    <div class="order-card">
-                        <div class="order-header">
-                            <div class="order-id">Order #${order.id}</div>
-                            <div class="order-date">${new Date(order.date).toLocaleDateString()}</div>
-                        </div>
-                        <div class="order-total">${order.total}</div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        // ============================================================================
-        // AUTH
-        // ============================================================================
-
-        function openAuthModal() {
-            if (appState.user) {
-                showPage('accountPage');
-                return;
-            }
-            document.getElementById('loginModal').classList.add('active');
-        }
-
-        function closeAuthModal() {
-            document.getElementById('loginModal').classList.remove('active');
-        }
-
-        let isLoginMode = true;
-
-        function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            const form = document.getElementById('authForm');
-            const title = document.getElementById('authTitle');
-            const submit = document.getElementById('authSubmit');
-            const toggle = document.getElementById('toggleText');
-
-            if (isLoginMode) {
-                title.textContent = t('login');
-                submit.textContent = t('login');
-                toggle.innerHTML = `Don't have an account? <a id="toggleAuth">${t('register')}</a>`;
-            } else {
-                title.textContent = t('register');
-                submit.textContent = t('register');
-                toggle.innerHTML = `Already have an account? <a id="toggleAuth">${t('login')}</a>`;
-            }
-
-            document.getElementById('toggleAuth').onclick = toggleAuthMode;
-        }
-
-        // ============================================================================
-        // EVENT LISTENERS
-        // ============================================================================
-
         function setupEventListeners() {
-            // Search
-            document.getElementById('searchInput').addEventListener('input', () => {
-                if (appState.currentPage === 'homePage') renderProducts();
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                if (query === '') {
+                    renderProducts();
+                } else {
+                    const filtered = appState.products.filter(p =>
+                        p.name.toLowerCase().includes(query) ||
+                        p.description.toLowerCase().includes(query) ||
+                        p.tags.some(t => t.toLowerCase().includes(query))
+                    );
+                    renderProducts(filtered);
+                }
             });
 
-            document.getElementById('sortBy').addEventListener('change', () => {
-                if (appState.currentPage === 'homePage') renderProducts();
+            document.getElementById('sortSelect').addEventListener('change', (e) => {
+                const value = e.target.value;
+                let sorted = [...appState.products];
+                if (value === 'price-low') sorted.sort((a, b) => a.price - b.price);
+                else if (value === 'price-high') sorted.sort((a, b) => b.price - a.price);
+                else if (value === 'rating') sorted.sort((a, b) => b.rating - a.rating);
+                else if (value === 'trending') sorted.sort((a, b) => b.trending - a.trending);
+                renderProducts(sorted);
             });
 
-            document.getElementById('subcategoryFilter').addEventListener('change', () => {
-                if (appState.currentPage === 'homePage') renderProducts();
+            document.getElementById('materialSelect').addEventListener('change', (e) => {
+                const material = e.target.value;
+                if (material === '') {
+                    renderProducts();
+                } else {
+                    const filtered = appState.products.filter(p => p.materials.includes(material));
+                    renderProducts(filtered);
+                }
             });
 
-            // Language Toggle
-            document.getElementById('langToggle').onclick = () => {
-                appState.currentLang = appState.currentLang === 'en' ? 'es' : 'en';
-                document.getElementById('langToggle').textContent = appState.currentLang === 'en' ? '🌐 EN' : '🌐 ES';
-                document.getElementById('heroTitle').textContent = t('heroTitle');
-                document.getElementById('heroSubtitle').textContent = t('heroSubtitle');
-                saveToLocalStorage();
-                renderProducts();
-            };
-
-            // Currency Toggle
-            document.getElementById('currencyToggle').onclick = () => {
-                appState.currentCurrency = appState.currentCurrency === 'usd' ? 'mxn' : 'usd';
-                document.getElementById('currencyToggle').textContent = appState.currentCurrency === 'usd' ? '$ USD' : '$ MXN';
-                saveToLocalStorage();
-                renderProducts();
-                updateCartDrawer();
-            };
-
-            // Cart
-            document.getElementById('cartBtn').onclick = () => {
-                document.getElementById('cartDrawer').classList.toggle('open');
-                updateCartDrawer();
-            };
-
-            document.getElementById('cartClose').onclick = () => {
-                document.getElementById('cartDrawer').classList.remove('open');
-            };
-
-            document.getElementById('checkoutBtn').onclick = () => {
-                if (appState.cart.length === 0) {
-                    showToast('Cart is empty');
-                    return;
-                }
-                if (!appState.user) {
-                    showToast(t('loginRequired'));
-                    closeAuthModal();
-                    openAuthModal();
-                    return;
-                }
-                const orderId = 'ORD-' + Date.now();
-                const total = appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                const totalDisplay = appState.currentCurrency === 'mxn'
-                    ? `$${(total * EXCHANGE_RATE).toFixed(2)} MXN`
-                    : `$${total.toFixed(2)} USD`;
-
-                const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-                orders.push({
-                    id: orderId,
-                    date: new Date().toISOString(),
-                    items: appState.cart.map(i => ({name: i.name, quantity: i.quantity})),
-                    total: totalDisplay
-                });
-                localStorage.setItem('orders', JSON.stringify(orders));
-
-                appState.cart = [];
-                saveToLocalStorage();
-                updateCartBadge();
-                updateCartDrawer();
-                document.getElementById('cartDrawer').classList.remove('open');
-                showToast(`Order ${orderId} placed successfully!`);
-            };
-
-            // Account
-            document.getElementById('accountBtn').onclick = () => {
-                if (!appState.user) {
-                    openAuthModal();
+            document.getElementById('priceSelect').addEventListener('change', (e) => {
+                const range = e.target.value;
+                if (range === '') {
+                    renderProducts();
                 } else {
-                    showPage('accountPage');
+                    let filtered;
+                    if (range === '0-20') filtered = appState.products.filter(p => p.price < 20);
+                    else if (range === '20-50') filtered = appState.products.filter(p => p.price >= 20 && p.price < 50);
+                    else if (range === '50-100') filtered = appState.products.filter(p => p.price >= 50 && p.price < 100);
+                    else if (range === '100') filtered = appState.products.filter(p => p.price >= 100);
+                    renderProducts(filtered);
                 }
-            };
+            });
 
-            // Favorites
-            document.getElementById('favoritesBtn').onclick = () => {
-                if (!appState.user) {
-                    showToast(t('loginRequired'));
-                    openAuthModal();
-                } else {
-                    showPage('favoritesPage');
-                }
-            };
-
-            // Brand
-            document.querySelector('.navbar-brand').onclick = (e) => {
-                e.preventDefault();
-                showPage('homePage');
-                appState.selectedCategory = null;
-                renderCategoryPills();
-                renderSubcategoryFilter();
-                renderProducts();
-            };
-
-            // Modal
-            document.getElementById('modalClose').onclick = () => {
-                document.getElementById('productModal').classList.remove('active');
-            };
-
-            document.getElementById('modalCancel').onclick = () => {
-                document.getElementById('productModal').classList.remove('active');
-            };
-
-            document.getElementById('productModal').onclick = (e) => {
-                if (e.target.id === 'productModal') {
-                    document.getElementById('productModal').classList.remove('active');
-                }
-            };
-
-            // Auth
-            document.getElementById('authForm').onsubmit = (e) => {
-                e.preventDefault();
-                const email = document.getElementById('authEmail').value;
-                const password = document.getElementById('authPassword').value;
-
-                if (isLoginMode) {
-                    appState.user = {email, name: email.split('@')[0], phone: '', password};
-                } else {
-                    appState.user = {email, name: email.split('@')[0], phone: '', password};
-                }
-
-                saveToLocalStorage();
-                closeAuthModal();
-                showToast(isLoginMode ? 'Logged in successfully' : 'Account created');
-                document.getElementById('authForm').reset();
-                document.getElementById('accountBtn').textContent = '👤 ' + appState.user.name;
-            };
-
-            // Toggle auth mode
-            document.getElementById('toggleAuth').onclick = toggleAuthMode;
-
-            // Custom order form
-            document.getElementById('customOrderForm').onsubmit = (e) => {
-                e.preventDefault();
-                showToast('Custom order request submitted! We will contact you soon.');
-                document.getElementById('customOrderForm').reset();
-            };
+            document.getElementById('cartBtn').addEventListener('click', openCart);
+            document.getElementById('mobileCartBtn').addEventListener('click', openCart);
+            document.getElementById('cartOverlay').addEventListener('click', closeCart);
+            document.getElementById('favBtn').addEventListener('click', () => {
+                const favorites = appState.products.filter(p => appState.favorites.includes(p.id));
+                renderProducts(favorites.length > 0 ? favorites : appState.products);
+            });
         }
 
-        // ============================================================================
-        // START
-        // ============================================================================
+        function setupMobileUI() {
+            const hamburger = document.getElementById('hamburger');
+            const drawer = document.getElementById('mobileDrawer');
+            hamburger.addEventListener('click', () => {
+                drawer.classList.toggle('active');
+            });
+            drawer.addEventListener('click', (e) => {
+                if (e.target === drawer) drawer.classList.remove('active');
+            });
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            init();
-            renderHeroCategories();
-            document.getElementById('heroTitle').textContent = t('heroTitle');
-            document.getElementById('heroSubtitle').textContent = t('heroSubtitle');
-            document.getElementById('searchInput').placeholder = t('searchPlaceholder');
-        });
+        function setupNavbarScroll() {
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 10) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
     </script>
+
 </body>
 </html>
